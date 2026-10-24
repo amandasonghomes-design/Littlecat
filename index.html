@@ -166,7 +166,7 @@ select{font:inherit;padding:6px 8px;border-radius:10px;border:1px solid #d9cfdc;
     <div class="row" style="justify-content:space-between"><h3>Mom's corner</h3><button class="sb ghost" id="closeParent">Done</button></div>
 
     <div>
-      <h4>Your voice for <span id="pDay">Day 1</span>: <span id="pHan" style="font-family:var(--han)">猫</span></h4>
+      <h4>Your voice for <span id="pDay">Lesson 1</span>: <span id="pHan" style="font-family:var(--han)">猫</span></h4>
       <div class="slot"><span>Character <span id="stC"></span></span><span class="row"><button class="sb rec" id="recC">🎙 Record</button><button class="sb ghost" id="tryC">Play</button><button class="sb ghost" id="saveC">Save file</button></span></div>
       <div class="slot" style="margin-top:6px"><span>Sentence <span id="stS"></span></span><span class="row"><button class="sb rec" id="recS">🎙 Record</button><button class="sb ghost" id="trySentP">Play</button><button class="sb ghost" id="saveS">Save file</button></span></div>
       <p class="help" style="margin-top:6px">A new recording plays right away on this phone. To let it play on every phone and computer, tap <b>Save file</b>, then upload that file to the <b>voice</b> folder of your GitHub repo (or send it to Claude). Keep the file name it gives you, like <code id="fnHint">day01-char.m4a</code>.</p>
@@ -186,11 +186,6 @@ select{font:inherit;padding:6px 8px;border-radius:10px;border:1px solid #d9cfdc;
       <div class="slot" style="margin-top:6px"><span>All themes <span id="stMA"></span></span><span class="row"><button class="sb" id="upMA">Add</button></span></div>
     </div>
 
-    <div>
-      <h4>Daily schedule</h4>
-      <p class="help" id="schedInfo"></p>
-      <div class="row" style="margin-top:6px"><button class="sb ghost" id="back1">One day back</button><button class="sb ghost" id="fwd1">Unlock next day</button><button class="sb ghost" id="restart">Start over</button></div>
-    </div>
     <p class="help">Files in the GitHub <b>voice</b> and <b>music</b> folders play everywhere. Anything recorded or added here without uploading stays on this phone only.</p>
   </div>
 </div>
@@ -266,8 +261,8 @@ const DAY=86400000;
 function today0(){const n=new Date();return new Date(n.getFullYear(),n.getMonth(),n.getDate()).getTime()}
 let start=ls.get("start",null); if(start==null){start=today0();ls.set("start",start)}
 let bonus=ls.get("bonus",0);
-function unlocked(){return Math.max(1,Math.min(L.length,Math.floor((today0()-start)/DAY)+1+bonus))}
-let cur=unlocked()-1;
+function unlocked(){return L.length}
+let cur=Math.min(L.length-1,Math.max(0,ls.get("cur",0)));
 let voice=ls.get("voice","mom");
 let themeChoice=ls.get("theme","auto");
 let done=ls.get("done",[]);
@@ -302,13 +297,14 @@ function applyTheme(){
 
 function render(){
   const [h,py,mean,pic,zh,spy,en]=L[cur];
-  $("dayLabel").textContent="第 "+(cur+1)+" 天 · Day "+(cur+1);
+  ls.set("cur",cur);
+  $("dayLabel").textContent="第 "+(cur+1)+" 课 · Lesson "+(cur+1);
   $("han").textContent=h;$("py").textContent=py;$("mean").textContent=mean;$("pic").textContent=pic;
   $("zh").innerHTML=[...zh].map(c=>c===h?"<b>"+c+"</b>":c).join("");
   $("spy").textContent=spy;$("en").textContent=en;
   const u=unlocked(),t=$("tiles");t.innerHTML="";
   L.forEach((l,i)=>{const b=document.createElement("button");b.className="tile"+(i===cur?" cur":"")+(done.includes(i)?" done":"");
-    b.disabled=i>=u;b.textContent=i<u?l[0]:"?";b.setAttribute("aria-label",i<u?"Day "+(i+1)+" "+l[0]:"Locked");
+    b.disabled=i>=u;b.textContent=i<u?l[0]:"?";b.setAttribute("aria-label",i<u?"Lesson "+(i+1)+" "+l[0]:"Locked");
     b.onclick=()=>{cur=i;render();refreshParent()};t.appendChild(b)});
   $("learned").textContent=done.includes(cur)?"⭐ 学会啦！Learned!":"⭐ 我学会了！";
   $("vMom").setAttribute("aria-pressed",voice==="mom");$("vBot").setAttribute("aria-pressed",voice==="bot");
@@ -433,18 +429,14 @@ async function saveFile(key){
   const a=document.createElement("a");a.href=URL.createObjectURL(file);a.download=name;document.body.appendChild(a);a.click();a.remove();
 }
 $("saveC").onclick=()=>saveFile("v-"+cur+"-c");$("saveS").onclick=()=>saveFile("v-"+cur+"-s");
-$("back1").onclick=()=>{bonus--;ls.set("bonus",bonus);cur=unlocked()-1;render();refreshParent()};
-$("fwd1").onclick=()=>{bonus++;ls.set("bonus",bonus);cur=unlocked()-1;render();refreshParent()};
-$("restart").onclick=()=>{start=today0();bonus=0;done=[];ls.set("start",start);ls.set("bonus",0);ls.set("done",[]);cur=0;render();refreshParent()};
 async function refreshParent(){
-  $("pDay").textContent="Day "+(cur+1);$("pHan").textContent=L[cur][0];
+  $("pDay").textContent="Lesson "+(cur+1);$("pHan").textContent=L[cur][0];
   $("fnHint").textContent=baseName("v-"+cur+"-c").split("/")[1]+".m4a";
   const mark=async(id,k)=>{const loc=await get(k),rem=await remote(k);
     $(id).innerHTML=rem?'<span class="ok">✓ on website</span>'+(loc?' <span class="ok">+ new on this phone</span>':''):loc?'<span class="ok">✓ on this phone</span>':'<span style="color:#9a8aa5">· not yet</span>'};
   mark("stC","v-"+cur+"-c");mark("stS","v-"+cur+"-s");
   const m=await get("m-"+season())||(await remote("m-"+season())?{name:"on website"}:null);$("stM").innerHTML=m?'<span class="ok">✓ '+(m.name||"song")+'</span>':'<span style="color:#9a8aa5">· none</span>';
   const ma=await get("m-all")||(await remote("m-all")?{name:"on website"}:null);$("stMA").innerHTML=ma?'<span class="ok">✓ '+(ma.name||"song")+'</span>':'<span style="color:#9a8aa5">· none</span>';
-  $("schedInfo").textContent="A new character unlocks every morning. Day "+unlocked()+" of "+L.length+" is unlocked today.";
 }
 if("speechSynthesis" in window){speechSynthesis.getVoices();speechSynthesis.onvoiceschanged=()=>{}}
 applyTheme();render();
