@@ -47,8 +47,9 @@ body{margin:0;background:linear-gradient(170deg,var(--sky1),var(--sky2));backgro
 .top{display:flex;align-items:center;justify-content:space-between;gap:8px}
 .day{font-family:var(--display);font-weight:800;font-size:20px;color:#fff;background:rgba(0,0,0,.25);padding:4px 14px;border-radius:999px;letter-spacing:.02em}
 [data-season="spring"] .day,[data-season="summer"] .day,[data-season="winter"] .day{background:rgba(255,255,255,.7);color:var(--ink)}
-.icons{display:flex;gap:8px}
-.ib{width:44px;height:44px;border-radius:50%;border:0;background:rgba(255,255,255,.88);font-size:20px;cursor:pointer;display:grid;place-items:center}
+.icons{display:flex;gap:16px}
+.ib{width:36px;height:36px;border-radius:50%;border:0;background:rgba(255,255,255,.8);font-size:16px;cursor:pointer;display:grid;place-items:center;position:relative;padding:0}
+.ib::after{content:"";position:absolute;inset:-5px}
 .ib[aria-pressed="false"]{opacity:.55}
 button:focus-visible{outline:3px solid var(--accent2);outline-offset:2px}
 
@@ -365,7 +366,7 @@ function applyTheme(){
     p.style.animationDuration=(9+Math.random()*10)+"s";p.style.animationDelay=(-Math.random()*18)+"s";
     p.style.fontSize=(18+Math.random()*20)+"px";fx.appendChild(p)}
   $("pTheme").textContent=SEASONS[s].name;
-  if(musicOn)startMusic();
+  if(musicOn){music.pause();musicOn=false;$("musicBtn").setAttribute("aria-pressed","false")}
   refreshParent();
 }
 
@@ -394,7 +395,8 @@ function render(){
 }
 
 /* audio */
-const player=new Audio();let music=new Audio();music.loop=true;music.volume=.3;
+const player=new Audio();let music=new Audio();music.loop=false;
+music.addEventListener("ended",()=>{musicOn=false;$("musicBtn").setAttribute("aria-pressed","false")});music.volume=.3;
 let lastURL=null;
 function duck(on){music.volume=on?.08:.3}
 function speak(text,pitch){
