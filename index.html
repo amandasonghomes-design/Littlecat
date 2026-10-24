@@ -101,7 +101,7 @@ button:focus-visible{outline:3px solid var(--accent2);outline-offset:2px}
 .line{text-align:left;padding:8px 10px;border-radius:14px;margin-top:6px;max-width:92%}
 .line.m{background:#fff;margin-right:auto}
 .line.a{background:color-mix(in srgb,var(--accent) 16%,#fff);margin-left:auto}
-.line .who{font-family:var(--display);font-weight:800;font-size:13px;color:var(--accent);text-transform:uppercase;letter-spacing:.05em}
+.line .who{font-family:var(--display);font-weight:800;font-size:13px;color:var(--accent);letter-spacing:.03em}
 .line .zh{font-size:22px}
 .lvl{grid-column:1/-1;font-family:var(--display);font-weight:800;font-size:14px;color:var(--soft);margin-top:6px}
 .shelf{background:rgba(255,255,255,.88);border-radius:22px;padding:12px}
@@ -380,7 +380,7 @@ function render(){
   $("han").textContent=h;$("py").textContent=py;$("mean").textContent=mean;$("pic").textContent=pic;
   const mark=t=>esc(t).split(h).join("<b>"+h+"</b>");
   if(dlg){
-    $("sentBody").innerHTML=dlg.map(([w,z,p,e])=>'<div class="line '+(w==="A"?"a":"m")+'"><span class="who">'+(w==="A"?"Angelina":"妈妈 Mom")+'</span><div class="zh">'+mark(z)+'</div><div class="spy">'+esc(p)+'</div><div class="en">'+esc(e)+'</div></div>').join("");
+    $("sentBody").innerHTML=dlg.map(([w,z,p,e])=>'<div class="line '+(w==="A"?"a":"m")+'"><span class="who">'+(w==="A"?"Angelina":"妈妈 Mamaちゃん")+'</span><div class="zh">'+mark(z)+'</div><div class="spy">'+esc(p)+'</div><div class="en">'+esc(e)+'</div></div>').join("");
     $("playSent").textContent="🔊 对话";
   }else{
     $("sentBody").innerHTML='<div class="zh">'+mark(zh)+'</div><div class="spy">'+esc(spy)+'</div><div class="en">'+esc(en)+'</div>';
