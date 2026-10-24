@@ -118,6 +118,7 @@ select{font:inherit;padding:6px 8px;border-radius:10px;border:1px solid #d9cfdc;
   <div class="top">
     <div class="day" id="dayLabel">第 1 天</div>
     <div class="icons">
+      <button class="ib" id="shareBtn" aria-label="Share this lesson">🔗</button>
       <button class="ib" id="musicBtn" aria-pressed="false" aria-label="Music">🎵</button>
       <button class="ib" id="themeBtn" aria-label="Change theme">🎨</button>
     </div>
@@ -329,6 +330,9 @@ let start=ls.get("start",null); if(start==null){start=today0();ls.set("start",st
 let bonus=ls.get("bonus",0);
 function unlocked(){return L.length}
 let cur=Math.min(L.length-1,Math.max(0,ls.get("cur",0)));
+const hashNum=()=>{const m=(location.hash||"").match(/^#(\d+)$/);return m?+m[1]-1:-1};
+if(hashNum()>=0&&hashNum()<L.length)cur=hashNum();
+window.addEventListener("hashchange",()=>{const n=hashNum();if(n>=0&&n<L.length&&n!==cur){cur=n;render();refreshParent()}});
 let voice=ls.get("voice","mom");
 let themeChoice=ls.get("theme","auto");
 let done=ls.get("done",[]);
@@ -364,6 +368,7 @@ function applyTheme(){
 function render(){
   const [h,py,mean,pic,zh,spy,en,dlg]=L[cur];
   ls.set("cur",cur);
+  try{history.replaceState(null,"","#"+(cur+1))}catch(e){}
   $("dayLabel").textContent="第 "+(cur+1)+" 课 · Level "+levelOf(cur);
   $("han").textContent=h;$("py").textContent=py;$("mean").textContent=mean;$("pic").textContent=pic;
   const mark=t=>esc(t).split(h).join("<b>"+h+"</b>");
@@ -455,6 +460,12 @@ async function startMusic(){
   music.src=src;
   try{await music.play()}catch(e){musicOn=false;$("musicBtn").setAttribute("aria-pressed","false")}
 }
+$("shareBtn").onclick=async()=>{
+  const url=location.origin+location.pathname+"#"+(cur+1);
+  const title="第 "+(cur+1)+" 课 "+L[cur][0]+" · Little Cat Chinese";
+  try{if(navigator.share){await navigator.share({title,url});return}}catch(e){if(e&&e.name==="AbortError")return}
+  try{await navigator.clipboard.writeText(url);$("note").textContent="Link copied: "+url}catch(e){$("note").textContent="Link: "+url}
+};
 $("musicBtn").onclick=()=>{musicOn=!musicOn;$("musicBtn").setAttribute("aria-pressed",musicOn);if(musicOn)startMusic();else music.pause()};
 
 const order=["auto","halloween","thanks","christmas","winter","newyear","spring","summer","autumn"];
