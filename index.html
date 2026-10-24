@@ -6,6 +6,8 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="theme-color" content="#2b1a4a">
+<link rel="icon" type="image/png" href="img/cat-icon.png">
+<link rel="apple-touch-icon" href="img/cat-icon.png">
 <title>Little Cat Chinese</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;700;800&family=Noto+Sans+SC:wght@400;700&family=Noto+Serif+SC:wght@700&display=swap">
@@ -29,6 +31,7 @@
 
 html,body{height:100%}
 html{background:var(--sky2)}
+[hidden]{display:none!important}
 body{margin:0;background:linear-gradient(170deg,var(--sky1),var(--sky2));background-attachment:fixed;color:var(--ink);font-family:var(--body);
   padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);overflow-x:hidden}
 .sb.rec{background:#e23b3b}.sb.rec.on{animation:blink 1s infinite}@keyframes blink{50%{opacity:.5}}
@@ -50,7 +53,20 @@ body{margin:0;background:linear-gradient(170deg,var(--sky1),var(--sky2));backgro
 button:focus-visible{outline:3px solid var(--accent2);outline-offset:2px}
 
 .card{background:var(--card);border-radius:28px;padding:18px 18px 20px;box-shadow:0 12px 0 rgba(0,0,0,.12),0 20px 40px rgba(0,0,0,.18);display:flex;flex-direction:column;align-items:center;gap:12px;position:relative}
-.cat{position:absolute;top:-34px;right:6px;width:84px;height:84px}
+.cat{position:absolute;top:-22px;right:-6px;width:96px;height:96px;filter:drop-shadow(0 6px 8px rgba(0,0,0,.25))}
+.cat img{width:100%;height:100%;object-fit:contain;transform-origin:50% 90%;animation:tilt 4s ease-in-out infinite}
+@keyframes tilt{50%{transform:rotate(-4deg)}}
+.cat .badge{position:absolute;left:-6px;bottom:4px;font-size:26px}
+.shelf-head{display:flex;align-items:center;gap:12px;margin-bottom:8px}
+.shelf-head img{width:72px;height:72px;border-radius:18px;object-fit:cover;flex:none}
+.shelf-head h2{margin:0}
+.shelf-head p{margin:2px 0 0;font-family:var(--display);font-size:14px;color:var(--soft)}
+.celebrate{position:fixed;inset:0;z-index:6;display:grid;place-items:center;background:rgba(0,0,0,.35);padding:24px}
+.celebrate .box{background:#fff8ef;border-radius:28px;padding:14px 14px 18px;text-align:center;max-width:300px;width:100%;animation:popin .4s cubic-bezier(.3,1.6,.5,1)}
+.celebrate img{width:100%;border-radius:20px;display:block}
+.celebrate b{display:block;font-family:var(--display);font-size:30px;color:var(--accent);margin-top:8px}
+@keyframes popin{from{transform:scale(.6);opacity:0}}
+@media (prefers-reduced-motion:reduce){.cat img,.celebrate .box{animation:none}}
 .pic{font-size:72px;line-height:1;margin-top:4px}
 .tzg{width:min(62vw,220px);aspect-ratio:1;max-width:100%;position:relative;border:3px solid var(--grid);border-radius:10px;background:#fff;cursor:pointer;display:grid;place-items:center;padding:0}
 .tzg::before,.tzg::after{content:"";position:absolute;inset:0;pointer-events:none}
@@ -125,20 +141,7 @@ select{font:inherit;padding:6px 8px;border-radius:10px;border:1px solid #d9cfdc;
   </div>
 
   <main class="card" id="card">
-    <svg class="cat" viewBox="0 0 100 100" aria-hidden="true">
-      <g id="catBody">
-        <path d="M22 40 L28 14 L44 30 Z" fill="#ffb86b"/><path d="M78 40 L72 14 L56 30 Z" fill="#ffb86b"/>
-        <ellipse cx="50" cy="52" rx="32" ry="28" fill="#ffb86b"/>
-        <path d="M27 22 L30 32 L38 30 Z M73 22 L70 32 L62 30 Z" fill="#ffd9e0"/>
-        <ellipse cx="38" cy="50" rx="4" ry="5.5" fill="#2a1f33"/><ellipse cx="62" cy="50" rx="4" ry="5.5" fill="#2a1f33"/>
-        <circle cx="39.5" cy="48" r="1.4" fill="#fff"/><circle cx="63.5" cy="48" r="1.4" fill="#fff"/>
-        <path d="M47 58 L53 58 L50 61 Z" fill="#ff7a9c"/>
-        <path d="M50 61 Q46 66 42 63 M50 61 Q54 66 58 63" stroke="#2a1f33" stroke-width="2" fill="none" stroke-linecap="round"/>
-        <ellipse cx="30" cy="60" rx="5" ry="3" fill="#ff9fb4" opacity=".7"/><ellipse cx="70" cy="60" rx="5" ry="3" fill="#ff9fb4" opacity=".7"/>
-        <path d="M58 30 L62 22 L66 30" stroke="#e8954a" stroke-width="3" fill="none"/>
-      </g>
-      <g id="hat"></g>
-    </svg>
+    <div class="cat" aria-hidden="true"><img src="img/cat-icon.png" alt=""><span class="badge" id="hat"></span></div>
     <div class="pic" id="pic" aria-hidden="true">🐱</div>
     <button class="tzg" id="tzg" aria-label="Hear the character"><span class="han" id="han">猫</span></button>
     <div class="py" id="py">māo</div>
@@ -160,13 +163,14 @@ select{font:inherit;padding:6px 8px;border-radius:10px;border:1px solid #d9cfdc;
   <div class="note" id="note"></div>
 
   <section class="shelf">
-    <h2>所有的字 · All characters</h2>
+    <div class="shelf-head"><img src="img/cat-blossom.jpg" alt="Kitty with plum blossoms"><div><h2>所有的字 · All characters</h2><p>小猫陪你学中文</p></div></div>
     <div class="tiles" id="tiles"></div>
   </section>
 
   <button class="parentbtn" id="openParent">For Mom ⚙︎</button>
 </div>
 
+<div class="celebrate" id="celebrate" hidden><div class="box"><img src="img/cat-blossom.jpg" alt=""><b>你真棒！</b></div></div>
 <div class="drawer" id="drawer" hidden>
   <div class="in">
     <div class="row" style="justify-content:space-between"><h3>Mom's corner</h3><button class="sb ghost" id="closeParent">Done</button></div>
@@ -353,7 +357,7 @@ function season(){return themeChoice==="auto"?autoSeason():themeChoice}
 
 function applyTheme(){
   const s=season();document.documentElement.dataset.season=s;
-  $("hat").innerHTML=HATS[SEASONS[s].hat]||"";
+  $("hat").textContent=SEASONS[s].fx[0];
   const fx=$("fx");fx.innerHTML="";
   const set=SEASONS[s];
   for(let i=0;i<14;i++){const p=document.createElement("span");p.className="p"+(set.dir==="up"?" up":"");
@@ -447,6 +451,7 @@ $("learned").onclick=e=>{
     s.style.setProperty("--dx",Math.cos(a)*120+"px");s.style.setProperty("--dy",Math.sin(a)*120-60+"px");
     document.body.appendChild(s);setTimeout(()=>s.remove(),1100)}
   speak("你真棒！");render();
+  const c=$("celebrate");c.hidden=false;clearTimeout(c._t);c._t=setTimeout(()=>{c.hidden=true},2200);c.onclick=()=>{c.hidden=true};
 };
 
 async function startMusic(){
