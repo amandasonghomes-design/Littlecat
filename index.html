@@ -54,9 +54,11 @@ body{margin:0;background:linear-gradient(170deg,var(--sky1),var(--sky2));backgro
 button:focus-visible{outline:3px solid var(--accent2);outline-offset:2px}
 
 .card{background:var(--card);border-radius:28px;padding:18px 18px 20px;box-shadow:0 12px 0 rgba(0,0,0,.12),0 20px 40px rgba(0,0,0,.18);display:flex;flex-direction:column;align-items:center;gap:12px;position:relative}
-.cat{position:absolute;top:-22px;right:-6px;width:96px;height:96px;filter:drop-shadow(0 6px 8px rgba(0,0,0,.25))}
+.cat{position:absolute;top:-22px;right:-6px;width:96px;height:96px;border:0;background:none;padding:0;cursor:pointer;filter:drop-shadow(0 6px 8px rgba(0,0,0,.25))}
 .cat img{width:100%;height:100%;object-fit:contain;transform-origin:50% 90%;animation:tilt 4s ease-in-out infinite}
 @keyframes tilt{50%{transform:rotate(-4deg)}}
+.cat img.swap{animation:swap .7s ease-in-out}
+@keyframes swap{0%{transform:translateY(0) scaleX(1)}35%{transform:translateY(-18px) scaleX(0)}65%{transform:translateY(-18px) scaleX(0)}100%{transform:translateY(0) scaleX(1)}}
 .cat .badge{position:absolute;left:-6px;bottom:4px;font-size:26px}
 .shelf-head{display:flex;align-items:center;gap:12px;margin-bottom:8px}
 .shelf-head img{width:72px;height:72px;border-radius:18px;object-fit:cover;flex:none}
@@ -142,7 +144,7 @@ select{font:inherit;padding:6px 8px;border-radius:10px;border:1px solid #d9cfdc;
   </div>
 
   <main class="card" id="card">
-    <div class="cat" aria-hidden="true"><img src="img/cat-icon.png" alt=""><span class="badge" id="hat"></span></div>
+    <button class="cat" id="cat" aria-label="Kitty"><img id="catImg" src="img/cat-a.png" alt=""><span class="badge" id="hat"></span></button>
     <div class="pic" id="pic" aria-hidden="true">🐱</div>
     <button class="tzg" id="tzg" aria-label="Hear the character"><span class="han" id="han">猫</span></button>
     <div class="py" id="py">māo</div>
@@ -531,6 +533,18 @@ async function refreshParent(){
   const ma=await get("m-all")||(await remote("m-all")?{name:"on website"}:null);$("stMA").innerHTML=ma?'<span class="ok">✓ '+(ma.name||"song")+'</span>':'<span style="color:#9a8aa5">· none</span>';
 }
 if("speechSynthesis" in window){speechSynthesis.getVoices();speechSynthesis.onvoiceschanged=()=>{}}
+/* two kitties take turns: hop, spin, swap */
+const CATS=["img/cat-a.png","img/cat-b.png"];CATS.forEach(u=>{const i=new Image();i.src=u});
+let catI=0;
+function swapCat(){
+  const im=$("catImg");
+  if(matchMedia("(prefers-reduced-motion: reduce)").matches){catI=1-catI;im.src=CATS[catI];return}
+  im.classList.remove("swap");void im.offsetWidth;im.classList.add("swap");
+  setTimeout(()=>{catI=1-catI;im.src=CATS[catI]},245);
+  setTimeout(()=>im.classList.remove("swap"),720);
+}
+let catTimer=setInterval(swapCat,10000);
+$("cat").onclick=()=>{swapCat();clearInterval(catTimer);catTimer=setInterval(swapCat,10000);try{speak("喵！",1.6)}catch(e){}};
 applyTheme();render();
 </script>
 </body>
