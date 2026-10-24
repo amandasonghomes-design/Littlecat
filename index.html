@@ -1,0 +1,453 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="theme-color" content="#2b1a4a">
+<title>Little Cat Chinese</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;700;800&family=Noto+Sans+SC:wght@400;700&family=Noto+Serif+SC:wght@700&display=swap">
+<style>
+/* Layout: one daily card centered on a seasonal "sky"; review shelf below; parent drawer slides up. Each season is a fixed palette (single-theme by design). */
+:root{
+  --sky1:#2b1a4a; --sky2:#4a2a6b; --card:#fff8ef; --ink:#2a1f33; --soft:#7a6a85;
+  --accent:#ff8a1f; --accent2:#7cd36b; --grid:#e8b9b0; --chip:#ffffff;
+  --display:"Baloo 2","Arial Rounded MT Bold",system-ui,sans-serif;
+  --han:"Noto Serif SC","Kaiti SC","STKaiti","Songti SC",serif;
+  --body:"Noto Sans SC","PingFang SC",system-ui,sans-serif;
+  color-scheme:light;
+}
+[data-season="christmas"]{--sky1:#0f3d2e;--sky2:#1d6a4a;--accent:#e23b3b;--accent2:#ffd34d;--grid:#f0b3b3}
+[data-season="newyear"]{--sky1:#8a1010;--sky2:#c42020;--accent:#ffb400;--accent2:#ff5e5e;--grid:#f2c879}
+[data-season="spring"]{--sky1:#ffc9de;--sky2:#c9ecff;--accent:#ff5c9a;--accent2:#51c27a;--grid:#f6b8cf}
+[data-season="summer"]{--sky1:#5ad0ff;--sky2:#b8f0ff;--accent:#ff7a3d;--accent2:#1fb5a8;--grid:#9fd8e8}
+[data-season="autumn"]{--sky1:#f2a541;--sky2:#ffe0a8;--accent:#c4512a;--accent2:#6a9a3a;--grid:#e9c08f}
+[data-season="winter"]{--sky1:#9fc4ec;--sky2:#e8f3ff;--accent:#3d7bd9;--accent2:#ff8fb1;--grid:#b9cfe9}
+[data-season="thanks"]{--sky1:#b8622b;--sky2:#f2c27a;--accent:#8a3b12;--accent2:#d99a1e;--grid:#e6b98b}
+
+html,body{height:100%}
+body{margin:0;background:linear-gradient(170deg,var(--sky1),var(--sky2));background-attachment:fixed;color:var(--ink);font-family:var(--body);
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);overflow-x:hidden}
+.sb.rec{background:#e23b3b}.sb.rec.on{animation:blink 1s infinite}@keyframes blink{50%{opacity:.5}}
+.slot{flex-wrap:wrap}
+#fx{position:fixed;inset:0;pointer-events:none;z-index:0;overflow:hidden}
+.p{position:absolute;top:-10%;font-size:28px;animation:fall linear infinite;opacity:.85}
+.p.up{top:auto;bottom:-10%;animation-name:rise}
+@keyframes fall{to{transform:translateY(120vh) rotate(260deg)}}
+@keyframes rise{to{transform:translateY(-120vh)}}
+@media (prefers-reduced-motion:reduce){.p{animation:none;display:none}}
+
+.wrap{position:relative;z-index:1;max-width:460px;margin:0 auto;padding-block:12px 40px;display:flex;flex-direction:column;gap:14px}
+.top{display:flex;align-items:center;justify-content:space-between;gap:8px}
+.day{font-family:var(--display);font-weight:800;font-size:20px;color:#fff;background:rgba(0,0,0,.25);padding:4px 14px;border-radius:999px;letter-spacing:.02em}
+[data-season="spring"] .day,[data-season="summer"] .day,[data-season="winter"] .day{background:rgba(255,255,255,.7);color:var(--ink)}
+.icons{display:flex;gap:8px}
+.ib{width:44px;height:44px;border-radius:50%;border:0;background:rgba(255,255,255,.88);font-size:20px;cursor:pointer;display:grid;place-items:center}
+.ib[aria-pressed="false"]{opacity:.55}
+button:focus-visible{outline:3px solid var(--accent2);outline-offset:2px}
+
+.card{background:var(--card);border-radius:28px;padding:18px 18px 20px;box-shadow:0 12px 0 rgba(0,0,0,.12),0 20px 40px rgba(0,0,0,.18);display:flex;flex-direction:column;align-items:center;gap:12px;position:relative}
+.cat{position:absolute;top:-34px;right:6px;width:84px;height:84px}
+.pic{font-size:72px;line-height:1;margin-top:4px}
+.tzg{width:min(62vw,220px);aspect-ratio:1;max-width:100%;position:relative;border:3px solid var(--grid);border-radius:10px;background:#fff;cursor:pointer;display:grid;place-items:center;padding:0}
+.tzg::before,.tzg::after{content:"";position:absolute;inset:0;pointer-events:none}
+.tzg::before{background:linear-gradient(var(--grid),var(--grid)) center/100% 2px no-repeat,linear-gradient(var(--grid),var(--grid)) center/2px 100% no-repeat;opacity:.6}
+.tzg::after{background:linear-gradient(45deg,transparent calc(50% - 1px),var(--grid) 50%,transparent calc(50% + 1px)),linear-gradient(-45deg,transparent calc(50% - 1px),var(--grid) 50%,transparent calc(50% + 1px));opacity:.35}
+.han{font-family:var(--han);font-weight:700;font-size:min(46vw,160px);line-height:1;color:var(--ink);position:relative;z-index:1}
+.tzg.pop .han{animation:pop .45s}
+@keyframes pop{40%{transform:scale(1.15)}}
+.py{font-family:var(--display);font-weight:700;font-size:30px;color:var(--accent);margin-top:-4px}
+.mean{font-family:var(--display);font-size:17px;color:var(--soft);margin-top:-12px}
+
+.sent{width:100%;border:0;background:color-mix(in srgb,var(--accent2) 16%,#fff);border-radius:18px;padding:12px 14px;cursor:pointer;text-align:center;font:inherit;color:inherit}
+.sent .zh{font-size:28px;font-weight:700;letter-spacing:.06em}
+.sent .zh b{color:var(--accent)}
+.sent .spy{font-family:var(--display);font-size:17px;color:var(--soft)}
+.sent .en{font-family:var(--display);font-size:15px;color:var(--soft);opacity:.85}
+
+.play{display:flex;gap:10px;width:100%}
+.big{flex:1;border:0;border-radius:18px;padding:12px;font-family:var(--display);font-weight:800;font-size:18px;cursor:pointer;color:#fff;background:var(--accent);box-shadow:0 5px 0 rgba(0,0,0,.18)}
+.big.alt{background:var(--accent2)}
+.big:active{transform:translateY(3px);box-shadow:0 2px 0 rgba(0,0,0,.18)}
+
+.voice{display:flex;background:rgba(255,255,255,.85);border-radius:999px;padding:4px;align-self:center;gap:4px}
+.voice button{border:0;background:transparent;border-radius:999px;padding:8px 16px;font-family:var(--display);font-weight:700;font-size:16px;cursor:pointer;color:var(--ink)}
+.voice button[aria-pressed="true"]{background:var(--accent);color:#fff}
+.note{font-family:var(--display);font-size:13px;color:#fff;text-align:center;min-height:18px;text-shadow:0 1px 2px rgba(0,0,0,.4)}
+[data-season="spring"] .note,[data-season="summer"] .note,[data-season="winter"] .note{color:var(--ink);text-shadow:none}
+
+.shelf{background:rgba(255,255,255,.88);border-radius:22px;padding:12px}
+.shelf h2{margin:0 0 8px;font-family:var(--display);font-size:16px;color:var(--soft);font-weight:700}
+.tiles{display:grid;grid-template-columns:repeat(6,1fr);gap:6px}
+.tile{aspect-ratio:1;border:2px solid var(--grid);border-radius:10px;background:#fff;font-family:var(--han);font-size:22px;cursor:pointer;color:var(--ink);padding:0;position:relative}
+.tile.cur{border-color:var(--accent);background:color-mix(in srgb,var(--accent) 14%,#fff)}
+.tile.done::after{content:"★";position:absolute;top:-6px;right:-4px;font-size:12px;color:var(--accent)}
+.tile:disabled{color:#c9c0cf;background:#f4f1f5;cursor:default}
+
+.parentbtn{align-self:center;border:0;background:rgba(255,255,255,.6);border-radius:999px;padding:8px 16px;font-family:var(--display);font-size:14px;cursor:pointer;color:var(--ink)}
+.drawer{position:fixed;inset:auto 0 0 0;z-index:5;background:#fffdf9;border-radius:24px 24px 0 0;max-height:86%;overflow:auto;box-shadow:0 -10px 40px rgba(0,0,0,.3);
+  padding:16px max(16px,env(safe-area-inset-right,0px)) calc(20px + env(safe-area-inset-bottom,0px)) max(16px,env(safe-area-inset-left,0px))}
+.drawer .in{max-width:460px;margin:0 auto;display:flex;flex-direction:column;gap:14px}
+.drawer h3{margin:0;font-family:var(--display);font-size:20px}
+.drawer h4{margin:0 0 6px;font-family:var(--display);font-size:15px;color:var(--soft);text-transform:uppercase;letter-spacing:.06em}
+.row{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.slot{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:10px 12px;border:1px solid #eadfe8;border-radius:14px}
+.slot span{min-width:0}
+.ok{color:#2a9d5b;font-weight:700}
+.sb{border:0;border-radius:10px;padding:8px 12px;background:var(--accent);color:#fff;font-family:var(--display);font-weight:700;cursor:pointer;font-size:14px}
+.sb.ghost{background:#efe8f0;color:var(--ink)}
+.help{font-size:13px;color:var(--soft);line-height:1.5;margin:0}
+select{font:inherit;padding:6px 8px;border-radius:10px;border:1px solid #d9cfdc;background:#fff}
+.burst{position:fixed;z-index:4;pointer-events:none;font-size:30px;animation:burst 1s ease-out forwards}
+@keyframes burst{to{transform:translate(var(--dx),var(--dy)) scale(.6);opacity:0}}
+</style>
+</head>
+<body>
+
+<div id="fx" aria-hidden="true"></div>
+<div class="wrap">
+  <div class="top">
+    <div class="day" id="dayLabel">第 1 天</div>
+    <div class="icons">
+      <button class="ib" id="musicBtn" aria-pressed="false" aria-label="Music">🎵</button>
+      <button class="ib" id="themeBtn" aria-label="Change theme">🎨</button>
+    </div>
+  </div>
+
+  <main class="card" id="card">
+    <svg class="cat" viewBox="0 0 100 100" aria-hidden="true">
+      <g id="catBody">
+        <path d="M22 40 L28 14 L44 30 Z" fill="#ffb86b"/><path d="M78 40 L72 14 L56 30 Z" fill="#ffb86b"/>
+        <ellipse cx="50" cy="52" rx="32" ry="28" fill="#ffb86b"/>
+        <path d="M27 22 L30 32 L38 30 Z M73 22 L70 32 L62 30 Z" fill="#ffd9e0"/>
+        <ellipse cx="38" cy="50" rx="4" ry="5.5" fill="#2a1f33"/><ellipse cx="62" cy="50" rx="4" ry="5.5" fill="#2a1f33"/>
+        <circle cx="39.5" cy="48" r="1.4" fill="#fff"/><circle cx="63.5" cy="48" r="1.4" fill="#fff"/>
+        <path d="M47 58 L53 58 L50 61 Z" fill="#ff7a9c"/>
+        <path d="M50 61 Q46 66 42 63 M50 61 Q54 66 58 63" stroke="#2a1f33" stroke-width="2" fill="none" stroke-linecap="round"/>
+        <ellipse cx="30" cy="60" rx="5" ry="3" fill="#ff9fb4" opacity=".7"/><ellipse cx="70" cy="60" rx="5" ry="3" fill="#ff9fb4" opacity=".7"/>
+        <path d="M58 30 L62 22 L66 30" stroke="#e8954a" stroke-width="3" fill="none"/>
+      </g>
+      <g id="hat"></g>
+    </svg>
+    <div class="pic" id="pic" aria-hidden="true">🐱</div>
+    <button class="tzg" id="tzg" aria-label="Hear the character"><span class="han" id="han">猫</span></button>
+    <div class="py" id="py">māo</div>
+    <div class="mean" id="mean">cat</div>
+    <button class="sent" id="sent" aria-label="Hear the sentence">
+      <div class="zh" id="zh"></div>
+      <div class="spy" id="spy"></div>
+      <div class="en" id="en"></div>
+    </button>
+    <div class="play">
+      <button class="big" id="playChar">🔊 字</button>
+      <button class="big alt" id="playSent">🔊 句子</button>
+    </div>
+    <button class="big" id="learned" style="width:100%;background:#ffc93c;color:#5a3a00">⭐ 我学会了！</button>
+  </main>
+
+  <div class="voice" role="group" aria-label="Voice">
+    <button id="vMom" aria-pressed="true">👩 妈妈</button>
+    <button id="vBot" aria-pressed="false">🤖 机器</button>
+  </div>
+  <div class="note" id="note"></div>
+
+  <section class="shelf">
+    <h2>我学过的字 · My characters</h2>
+    <div class="tiles" id="tiles"></div>
+  </section>
+
+  <button class="parentbtn" id="openParent">For Mom ⚙︎</button>
+</div>
+
+<div class="drawer" id="drawer" hidden>
+  <div class="in">
+    <div class="row" style="justify-content:space-between"><h3>Mom's corner</h3><button class="sb ghost" id="closeParent">Done</button></div>
+
+    <div>
+      <h4>Your voice for <span id="pDay">Day 1</span>: <span id="pHan" style="font-family:var(--han)">猫</span></h4>
+      <div class="slot"><span>Character <span id="stC"></span></span><span class="row"><button class="sb rec" id="recC">🎙 Record</button><button class="sb ghost" id="tryC">Play</button><button class="sb ghost" id="saveC">Save file</button></span></div>
+      <div class="slot" style="margin-top:6px"><span>Sentence <span id="stS"></span></span><span class="row"><button class="sb rec" id="recS">🎙 Record</button><button class="sb ghost" id="trySentP">Play</button><button class="sb ghost" id="saveS">Save file</button></span></div>
+      <p class="help" style="margin-top:6px">A new recording plays right away on this phone. To let it play on every phone and computer, tap <b>Save file</b>, then upload that file to the <b>voice</b> folder of your GitHub repo (or send it to Claude). Keep the file name it gives you, like <code id="fnHint">day01-char.m4a</code>.</p>
+      <div class="row" style="margin-top:6px"><button class="sb ghost" id="upC">Use a file for character</button><button class="sb ghost" id="upS">Use a file for sentence</button></div>
+    </div>
+
+    <div>
+      <h4>Theme</h4>
+      <div class="row"><select id="themeSel"></select></div>
+      <p class="help">"Auto" changes with the calendar: Halloween in late October, Christmas in December, and so on.</p>
+    </div>
+
+    <div>
+      <h4>Music for <span id="pTheme">this theme</span></h4>
+      <div class="slot"><span>Background song <span id="stM"></span></span><span class="row"><button class="sb ghost" id="clrM">Remove</button><button class="sb" id="upM">Add</button></span></div>
+      <p class="help">Songs added here play on this phone. For every device, upload songs to the <b>music</b> folder on GitHub named after the theme, like <code>halloween.mp3</code>, <code>christmas.mp3</code>, or <code>all.mp3</code> for every theme.</p>
+      <div class="slot" style="margin-top:6px"><span>All themes <span id="stMA"></span></span><span class="row"><button class="sb" id="upMA">Add</button></span></div>
+    </div>
+
+    <div>
+      <h4>Daily schedule</h4>
+      <p class="help" id="schedInfo"></p>
+      <div class="row" style="margin-top:6px"><button class="sb ghost" id="back1">One day back</button><button class="sb ghost" id="fwd1">Unlock next day</button><button class="sb ghost" id="restart">Start over</button></div>
+    </div>
+    <p class="help">Files in the GitHub <b>voice</b> and <b>music</b> folders play everywhere. Anything recorded or added here without uploading stays on this phone only.</p>
+  </div>
+</div>
+<input type="file" id="file" accept="audio/*,.m4a,.mp3,.wav,.aac" hidden>
+
+<script>
+const L=[
+["猫","māo","cat","🐱","小猫喵喵叫。","Xiǎo māo miāo miāo jiào.","The kitty says meow."],
+["狗","gǒu","dog","🐶","小狗汪汪叫。","Xiǎo gǒu wāng wāng jiào.","The puppy says woof."],
+["大","dà","big","🐘","大象很大。","Dàxiàng hěn dà.","The elephant is big."],
+["小","xiǎo","small","🐟","小鱼很小。","Xiǎo yú hěn xiǎo.","The little fish is small."],
+["好","hǎo","good","👋","你好！","Nǐ hǎo!","Hello!"],
+["月","yuè","moon","🌙","月亮弯弯。","Yuèliang wānwān.","The moon is curvy."],
+["日","rì","sun, day","🌅","日出很美。","Rì chū hěn měi.","The sunrise is pretty."],
+["山","shān","mountain","⛰️","山很高。","Shān hěn gāo.","The mountain is tall."],
+["水","shuǐ","water","💧","我爱喝水。","Wǒ ài hē shuǐ.","I love drinking water."],
+["火","huǒ","fire","🔥","火很热。","Huǒ hěn rè.","Fire is hot."],
+["花","huā","flower","🌸","花儿真香。","Huā'ér zhēn xiāng.","The flower smells nice."],
+["鱼","yú","fish","🐠","鱼在水里游。","Yú zài shuǐ lǐ yóu.","The fish swims in the water."],
+["鸟","niǎo","bird","🐦","小鸟会飞。","Xiǎo niǎo huì fēi.","Little birds can fly."],
+["妈","mā","mom","👩","我爱妈妈。","Wǒ ài māma.","I love Mommy."],
+["爸","bà","dad","👨","爸爸抱抱我。","Bàba bàobao wǒ.","Daddy gives me a hug."],
+["手","shǒu","hand","👏","拍拍小手。","Pāipai xiǎo shǒu.","Clap your little hands."],
+["口","kǒu","mouth","🍚","大口吃饭。","Dà kǒu chī fàn.","Take a big bite of rice."],
+["果","guǒ","fruit","🍎","我爱吃苹果。","Wǒ ài chī píngguǒ.","I love eating apples."],
+["雨","yǔ","rain","🌧️","下雨了。","Xià yǔ le.","It's raining."],
+["雪","xuě","snow","❄️","雪花白白的。","Xuěhuā báibái de.","Snowflakes are white."],
+["星","xīng","star","⭐","星星亮晶晶。","Xīngxing liàng jīngjīng.","The stars twinkle."],
+["云","yún","cloud","☁️","白云飘飘。","Báiyún piāo piāo.","White clouds float by."],
+["兔","tù","rabbit","🐰","小兔跳跳跳。","Xiǎo tù tiào tiào tiào.","The bunny hops, hops, hops."],
+["熊","xióng","bear","🐼","熊猫爱吃竹子。","Xióngmāo ài chī zhúzi.","Pandas love bamboo."],
+["车","chē","car","🚗","汽车嘀嘀嘀。","Qìchē dī dī dī.","The car goes beep beep."],
+["书","shū","book","📚","我爱看书。","Wǒ ài kàn shū.","I love reading books."],
+["家","jiā","home","🏠","我爱我家。","Wǒ ài wǒ jiā.","I love my home."],
+["笑","xiào","laugh","😄","宝宝笑哈哈。","Bǎobao xiào hāhā.","Baby laughs ha ha."],
+["人","rén","person","🧒","我是好人。","Wǒ shì hǎo rén.","I am a good person."],
+["爱","ài","love","❤️","我爱你。","Wǒ ài nǐ.","I love you."]
+];
+
+const SEASONS={
+ auto:{name:"Auto (by date)"},
+ halloween:{name:"Halloween 🎃",fx:["🎃","🦇","👻","⭐"],dir:"down",hat:"witch"},
+ thanks:{name:"Thanksgiving 🦃",fx:["🍂","🍁","🌽"],dir:"down",hat:"pilgrim"},
+ christmas:{name:"Christmas 🎄",fx:["❄️","❄️","⭐","🎁"],dir:"down",hat:"santa"},
+ winter:{name:"Winter ⛄",fx:["❄️","❄️","☃️"],dir:"down",hat:"beanie"},
+ newyear:{name:"Lunar New Year 🧧",fx:["🧧","🏮","✨"],dir:"down",hat:"newyear"},
+ spring:{name:"Spring 🌸",fx:["🌸","🌸","🦋"],dir:"down",hat:"flower"},
+ summer:{name:"Summer 🌊",fx:["🫧","🫧","🐚"],dir:"up",hat:"sun"},
+ autumn:{name:"Autumn 🍁",fx:["🍁","🍂","🍂"],dir:"down",hat:"none"}
+};
+const HATS={
+ witch:'<path d="M18 30 Q50 22 82 30 L70 34 Q50 30 30 34 Z" fill="#3a2458"/><path d="M34 31 L56 -6 L66 30 Z" fill="#3a2458"/><rect x="38" y="24" width="26" height="5" fill="#ff8a1f"/>',
+ santa:'<path d="M24 32 Q50 0 76 32 Z" fill="#e23b3b"/><rect x="20" y="28" width="60" height="8" rx="4" fill="#fff"/><circle cx="72" cy="6" r="6" fill="#fff"/>',
+ beanie:'<path d="M24 32 Q50 2 76 32 Z" fill="#3d7bd9"/><rect x="22" y="28" width="56" height="7" rx="3" fill="#ff8fb1"/><circle cx="50" cy="6" r="5" fill="#ff8fb1"/>',
+ newyear:'<rect x="40" y="10" width="20" height="16" rx="4" fill="#e01b1b"/><rect x="45" y="6" width="10" height="4" fill="#ffb400"/><text x="50" y="22" font-size="10" text-anchor="middle" fill="#ffd34d" font-family="serif">福</text>',
+ flower:'<g transform="translate(72 26)"><circle r="5" cy="-6" fill="#ff8fc0"/><circle r="5" cy="6" fill="#ff8fc0"/><circle r="5" cx="-6" fill="#ff8fc0"/><circle r="5" cx="6" fill="#ff8fc0"/><circle r="4" fill="#ffd34d"/></g>',
+ sun:'<path d="M20 30 Q50 26 80 30 L72 34 Q50 31 28 34 Z" fill="#ffd34d"/><path d="M32 31 Q50 8 68 31 Z" fill="#ffd34d"/><rect x="33" y="25" width="34" height="4" fill="#ff7a3d"/>',
+ pilgrim:'<rect x="34" y="8" width="32" height="22" fill="#3a2a1f"/><rect x="22" y="28" width="56" height="5" rx="2" fill="#3a2a1f"/><rect x="34" y="20" width="32" height="4" fill="#d99a1e"/>',
+ none:''
+};
+
+const $=id=>document.getElementById(id);
+const ls={get(k,d){try{const v=localStorage.getItem(k);return v==null?d:JSON.parse(v)}catch(e){return d}},set(k,v){try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}}};
+
+/* IndexedDB for audio blobs */
+let dbp=null;
+function idb(){if(dbp)return dbp;dbp=new Promise((res)=>{try{const r=indexedDB.open("xiaomao",1);r.onupgradeneeded=()=>r.result.createObjectStore("media");r.onsuccess=()=>res(r.result);r.onerror=()=>res(null)}catch(e){res(null)}});return dbp}
+async function put(k,v){const d=await idb();if(!d)return false;return new Promise(r=>{try{const t=d.transaction("media","readwrite");v==null?t.objectStore("media").delete(k):t.objectStore("media").put(v,k);t.oncomplete=()=>r(true);t.onerror=()=>r(false)}catch(e){r(false)}})}
+async function get(k){const d=await idb();if(!d)return null;return new Promise(r=>{try{const q=d.transaction("media").objectStore("media").get(k);q.onsuccess=()=>r(q.result||null);q.onerror=()=>r(null)}catch(e){r(null)}})}
+
+/* state */
+const DAY=86400000;
+function today0(){const n=new Date();return new Date(n.getFullYear(),n.getMonth(),n.getDate()).getTime()}
+let start=ls.get("start",null); if(start==null){start=today0();ls.set("start",start)}
+let bonus=ls.get("bonus",0);
+function unlocked(){return Math.max(1,Math.min(L.length,Math.floor((today0()-start)/DAY)+1+bonus))}
+let cur=unlocked()-1;
+let voice=ls.get("voice","mom");
+let themeChoice=ls.get("theme","auto");
+let done=ls.get("done",[]);
+let musicOn=false;
+
+function autoSeason(d=new Date()){
+  const m=d.getMonth()+1,day=d.getDate();
+  if((m===10&&day>=15)||(m===11&&day<=1))return "halloween";
+  if(m===11)return "thanks";
+  if(m===12)return "christmas";
+  if(m===1&&day>=20||m===2&&day<=20)return "newyear";
+  if(m<=2)return "winter";
+  if(m<=5)return "spring";
+  if(m<=8)return "summer";
+  return "autumn";
+}
+function season(){return themeChoice==="auto"?autoSeason():themeChoice}
+
+function applyTheme(){
+  const s=season();document.documentElement.dataset.season=s;
+  $("hat").innerHTML=HATS[SEASONS[s].hat]||"";
+  const fx=$("fx");fx.innerHTML="";
+  const set=SEASONS[s];
+  for(let i=0;i<14;i++){const p=document.createElement("span");p.className="p"+(set.dir==="up"?" up":"");
+    p.textContent=set.fx[i%set.fx.length];p.style.left=(Math.random()*100)+"%";
+    p.style.animationDuration=(9+Math.random()*10)+"s";p.style.animationDelay=(-Math.random()*18)+"s";
+    p.style.fontSize=(18+Math.random()*20)+"px";fx.appendChild(p)}
+  $("pTheme").textContent=SEASONS[s].name;
+  if(musicOn)startMusic();
+  refreshParent();
+}
+
+function render(){
+  const [h,py,mean,pic,zh,spy,en]=L[cur];
+  $("dayLabel").textContent="第 "+(cur+1)+" 天 · Day "+(cur+1);
+  $("han").textContent=h;$("py").textContent=py;$("mean").textContent=mean;$("pic").textContent=pic;
+  $("zh").innerHTML=[...zh].map(c=>c===h?"<b>"+c+"</b>":c).join("");
+  $("spy").textContent=spy;$("en").textContent=en;
+  const u=unlocked(),t=$("tiles");t.innerHTML="";
+  L.forEach((l,i)=>{const b=document.createElement("button");b.className="tile"+(i===cur?" cur":"")+(done.includes(i)?" done":"");
+    b.disabled=i>=u;b.textContent=i<u?l[0]:"?";b.setAttribute("aria-label",i<u?"Day "+(i+1)+" "+l[0]:"Locked");
+    b.onclick=()=>{cur=i;render();refreshParent()};t.appendChild(b)});
+  $("learned").textContent=done.includes(cur)?"⭐ 学会啦！Learned!":"⭐ 我学会了！";
+  $("vMom").setAttribute("aria-pressed",voice==="mom");$("vBot").setAttribute("aria-pressed",voice==="bot");
+  $("note").textContent="";
+}
+
+/* audio */
+const player=new Audio();let music=new Audio();music.loop=true;music.volume=.3;
+let lastURL=null;
+function duck(on){music.volume=on?.08:.3}
+function speak(text){
+  return new Promise(r=>{
+    if(!("speechSynthesis" in window)){$("note").textContent="This browser has no built-in voice.";return r()}
+    speechSynthesis.cancel();const u=new SpeechSynthesisUtterance(text);u.lang="zh-CN";u.rate=.75;
+    const vs=speechSynthesis.getVoices().filter(v=>/^zh(-|_)?(CN|Hans)?/i.test(v.lang));
+    const pick=vs.find(v=>/premium|enhanced/i.test(v.name))||vs.find(v=>/CN/i.test(v.lang))||vs[0];if(pick)u.voice=pick;
+    u.onend=r;u.onerror=r;duck(true);speechSynthesis.speak(u);
+  }).then(()=>duck(false));
+}
+/* files on the website: voice/day01-char.m4a, voice/day01-sentence.m4a, music/halloween.mp3, music/all.mp3 */
+const EXTS=["m4a","mp3","mp4","aac","wav","webm","ogg"];
+function baseName(key){
+  if(key.startsWith("m-"))return "music/"+key.slice(2);
+  const [,d,t]=key.split("-");return "voice/day"+String(+d+1).padStart(2,"0")+"-"+(t==="c"?"char":"sentence");
+}
+const remoteCache={};
+async function remote(key){
+  if(key in remoteCache)return remoteCache[key];
+  remoteCache[key]=null;
+  for(const e of EXTS){
+    const u=baseName(key)+"."+e;
+    try{const r=await fetch(u,{method:"HEAD",cache:"no-cache"});if(r.ok){remoteCache[key]=u;break}}catch(err){}
+  }
+  return remoteCache[key];
+}
+async function srcFor(key){
+  const b=await get(key);
+  if(b){if(lastURL)URL.revokeObjectURL(lastURL);lastURL=URL.createObjectURL(b);return lastURL}
+  return remote(key);
+}
+async function playKey(key,text){
+  if(voice==="mom"){
+    const src=await srcFor(key);
+    if(src){try{speechSynthesis.cancel()}catch(e){}player.src=src;duck(true);
+      player.onended=()=>duck(false);try{await player.play();return}catch(e){duck(false)}}
+    $("note").textContent="Mom hasn't recorded this one yet, so the robot is reading it.";
+  }
+  return speak(text);
+}
+const sayChar=()=>{$("tzg").classList.remove("pop");void $("tzg").offsetWidth;$("tzg").classList.add("pop");playKey("v-"+cur+"-c",L[cur][0])};
+const saySent=()=>playKey("v-"+cur+"-s",L[cur][4]);
+$("tzg").onclick=sayChar;$("playChar").onclick=sayChar;$("sent").onclick=saySent;$("playSent").onclick=saySent;
+$("vMom").onclick=()=>{voice="mom";ls.set("voice",voice);render()};
+$("vBot").onclick=()=>{voice="bot";ls.set("voice",voice);render()};
+
+$("learned").onclick=e=>{
+  if(!done.includes(cur)){done.push(cur);ls.set("done",done)}
+  const r=e.currentTarget.getBoundingClientRect();
+  for(let i=0;i<12;i++){const s=document.createElement("span");s.className="burst";s.textContent=["⭐","✨","💖"][i%3];
+    s.style.left=(r.left+r.width/2)+"px";s.style.top=(r.top)+"px";const a=Math.PI*2*i/12;
+    s.style.setProperty("--dx",Math.cos(a)*120+"px");s.style.setProperty("--dy",Math.sin(a)*120-60+"px");
+    document.body.appendChild(s);setTimeout(()=>s.remove(),1100)}
+  speak("你真棒！");render();
+};
+
+async function startMusic(){
+  const s=season();let src=null,b=await get("m-"+s);
+  if(!b)src=await remote("m-"+s);
+  if(!b&&!src)b=await get("m-all");
+  if(!b&&!src)src=await remote("m-all");
+  if(!b&&!src){$("note").textContent="No song yet. Mom can add one in Mom's corner.";musicOn=false;$("musicBtn").setAttribute("aria-pressed","false");return}
+  if(music._u){URL.revokeObjectURL(music._u);music._u=null}
+  if(b){music._u=URL.createObjectURL(b);src=music._u}
+  music.src=src;
+  try{await music.play()}catch(e){musicOn=false;$("musicBtn").setAttribute("aria-pressed","false")}
+}
+$("musicBtn").onclick=()=>{musicOn=!musicOn;$("musicBtn").setAttribute("aria-pressed",musicOn);if(musicOn)startMusic();else music.pause()};
+
+const order=["auto","halloween","thanks","christmas","winter","newyear","spring","summer","autumn"];
+$("themeBtn").onclick=()=>{const i=order.indexOf(themeChoice);themeChoice=order[(i+1)%order.length];ls.set("theme",themeChoice);
+  $("themeSel").value=themeChoice;applyTheme();$("note").textContent=themeChoice==="auto"?"Theme: Auto ("+SEASONS[season()].name+")":"Theme: "+SEASONS[themeChoice].name};
+order.forEach(k=>{const o=document.createElement("option");o.value=k;o.textContent=SEASONS[k].name;$("themeSel").appendChild(o)});
+$("themeSel").value=themeChoice;
+$("themeSel").onchange=e=>{themeChoice=e.target.value;ls.set("theme",themeChoice);applyTheme()};
+
+/* parent */
+let pending=null;
+$("openParent").onclick=()=>{$("drawer").hidden=false;refreshParent()};
+$("closeParent").onclick=()=>{$("drawer").hidden=true};
+function pick(key){pending=key;$("file").value="";$("file").click()}
+$("file").onchange=async e=>{const f=e.target.files[0];if(!f||!pending)return;const ok=await put(pending,f);
+  if(!ok)alertNote("Couldn't save on this device. Private browsing can block saving.");refreshParent();pending=null};
+function alertNote(t){$("note").textContent=t}
+$("upC").onclick=()=>pick("v-"+cur+"-c");$("upS").onclick=()=>pick("v-"+cur+"-s");
+$("upM").onclick=()=>pick("m-"+season());$("upMA").onclick=()=>pick("m-all");
+$("clrM").onclick=async()=>{await put("m-"+season(),null);refreshParent()};
+$("tryC").onclick=async()=>{const v=voice;voice="mom";await playKey("v-"+cur+"-c",L[cur][0]);voice=v};
+$("trySentP").onclick=async()=>{const v=voice;voice="mom";await playKey("v-"+cur+"-s",L[cur][4]);voice=v};
+
+/* recording with the microphone */
+let rec=null,recKey=null,chunks=[];
+function extFor(type){type=type||"";if(type.includes("mp4")||type.includes("m4a")||type.includes("aac"))return "m4a";if(type.includes("webm"))return "webm";if(type.includes("ogg"))return "ogg";if(type.includes("mpeg"))return "mp3";if(type.includes("wav"))return "wav";return "m4a"}
+async function toggleRec(key,btn){
+  if(rec&&rec.state==="recording"){rec.stop();return}
+  if(!navigator.mediaDevices||!window.MediaRecorder){alertNote("This browser can't record. Use a voice memo app and 'Use a file' instead.");return}
+  let stream;try{stream=await navigator.mediaDevices.getUserMedia({audio:true})}catch(e){alertNote("Microphone permission was blocked. Allow it in the browser settings and try again.");return}
+  const type=["audio/mp4","audio/webm;codecs=opus","audio/webm"].find(t=>MediaRecorder.isTypeSupported&&MediaRecorder.isTypeSupported(t));
+  rec=new MediaRecorder(stream,type?{mimeType:type}:undefined);recKey=key;chunks=[];
+  rec.ondataavailable=e=>{if(e.data.size)chunks.push(e.data)};
+  rec.onstop=async()=>{stream.getTracks().forEach(t=>t.stop());btn.classList.remove("on");btn.textContent="🎙 Record";
+    const blob=new Blob(chunks,{type:rec.mimeType||type||"audio/mp4"});await put(recKey,blob);refreshParent();
+    player.src=URL.createObjectURL(blob);player.play().catch(()=>{});};
+  rec.start();btn.classList.add("on");btn.textContent="■ Stop";
+}
+$("recC").onclick=e=>toggleRec("v-"+cur+"-c",e.currentTarget);
+$("recS").onclick=e=>toggleRec("v-"+cur+"-s",e.currentTarget);
+async function saveFile(key){
+  const b=await get(key);if(!b){alertNote("Record this one first, then save it.");return}
+  const name=baseName(key).split("/")[1]+"."+extFor(b.type);
+  const file=new File([b],name,{type:b.type||"audio/mp4"});
+  try{if(navigator.canShare&&navigator.canShare({files:[file]})){await navigator.share({files:[file],title:name});return}}catch(e){if(e&&e.name==="AbortError")return}
+  const a=document.createElement("a");a.href=URL.createObjectURL(file);a.download=name;document.body.appendChild(a);a.click();a.remove();
+}
+$("saveC").onclick=()=>saveFile("v-"+cur+"-c");$("saveS").onclick=()=>saveFile("v-"+cur+"-s");
+$("back1").onclick=()=>{bonus--;ls.set("bonus",bonus);cur=unlocked()-1;render();refreshParent()};
+$("fwd1").onclick=()=>{bonus++;ls.set("bonus",bonus);cur=unlocked()-1;render();refreshParent()};
+$("restart").onclick=()=>{start=today0();bonus=0;done=[];ls.set("start",start);ls.set("bonus",0);ls.set("done",[]);cur=0;render();refreshParent()};
+async function refreshParent(){
+  $("pDay").textContent="Day "+(cur+1);$("pHan").textContent=L[cur][0];
+  $("fnHint").textContent=baseName("v-"+cur+"-c").split("/")[1]+".m4a";
+  const mark=async(id,k)=>{const loc=await get(k),rem=await remote(k);
+    $(id).innerHTML=rem?'<span class="ok">✓ on website</span>'+(loc?' <span class="ok">+ new on this phone</span>':''):loc?'<span class="ok">✓ on this phone</span>':'<span style="color:#9a8aa5">· not yet</span>'};
+  mark("stC","v-"+cur+"-c");mark("stS","v-"+cur+"-s");
+  const m=await get("m-"+season())||(await remote("m-"+season())?{name:"on website"}:null);$("stM").innerHTML=m?'<span class="ok">✓ '+(m.name||"song")+'</span>':'<span style="color:#9a8aa5">· none</span>';
+  const ma=await get("m-all")||(await remote("m-all")?{name:"on website"}:null);$("stMA").innerHTML=ma?'<span class="ok">✓ '+(ma.name||"song")+'</span>':'<span style="color:#9a8aa5">· none</span>';
+  $("schedInfo").textContent="A new character unlocks every morning. Day "+unlocked()+" of "+L.length+" is unlocked today.";
+}
+if("speechSynthesis" in window){speechSynthesis.getVoices();speechSynthesis.onvoiceschanged=()=>{}}
+applyTheme();render();
+</script>
+</body>
+</html>
