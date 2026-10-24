@@ -28,6 +28,7 @@
 [data-season="thanks"]{--sky1:#b8622b;--sky2:#f2c27a;--accent:#8a3b12;--accent2:#d99a1e;--grid:#e6b98b}
 
 html,body{height:100%}
+html{background:var(--sky2)}
 body{margin:0;background:linear-gradient(170deg,var(--sky1),var(--sky2));background-attachment:fixed;color:var(--ink);font-family:var(--body);
   padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);overflow-x:hidden}
 .sb.rec{background:#e23b3b}.sb.rec.on{animation:blink 1s infinite}@keyframes blink{50%{opacity:.5}}
@@ -78,6 +79,12 @@ button:focus-visible{outline:3px solid var(--accent2);outline-offset:2px}
 .note{font-family:var(--display);font-size:13px;color:#fff;text-align:center;min-height:18px;text-shadow:0 1px 2px rgba(0,0,0,.4)}
 [data-season="spring"] .note,[data-season="summer"] .note,[data-season="winter"] .note{color:var(--ink);text-shadow:none}
 
+.line{text-align:left;padding:8px 10px;border-radius:14px;margin-top:6px;max-width:92%}
+.line.m{background:#fff;margin-right:auto}
+.line.a{background:color-mix(in srgb,var(--accent) 16%,#fff);margin-left:auto}
+.line .who{font-family:var(--display);font-weight:800;font-size:13px;color:var(--accent);text-transform:uppercase;letter-spacing:.05em}
+.line .zh{font-size:22px}
+.lvl{grid-column:1/-1;font-family:var(--display);font-weight:800;font-size:14px;color:var(--soft);margin-top:6px}
 .shelf{background:rgba(255,255,255,.88);border-radius:22px;padding:12px}
 .shelf h2{margin:0 0 8px;font-family:var(--display);font-size:16px;color:var(--soft);font-weight:700}
 .tiles{display:grid;grid-template-columns:repeat(6,1fr);gap:6px}
@@ -136,9 +143,7 @@ select{font:inherit;padding:6px 8px;border-radius:10px;border:1px solid #d9cfdc;
     <div class="py" id="py">māo</div>
     <div class="mean" id="mean">cat</div>
     <button class="sent" id="sent" aria-label="Hear the sentence">
-      <div class="zh" id="zh"></div>
-      <div class="spy" id="spy"></div>
-      <div class="en" id="en"></div>
+      <div id="sentBody"></div>
     </button>
     <div class="play">
       <button class="big" id="playChar">🔊 字</button>
@@ -154,7 +159,7 @@ select{font:inherit;padding:6px 8px;border-radius:10px;border:1px solid #d9cfdc;
   <div class="note" id="note"></div>
 
   <section class="shelf">
-    <h2>我学过的字 · My characters</h2>
+    <h2>所有的字 · All characters</h2>
     <div class="tiles" id="tiles"></div>
   </section>
 
@@ -168,7 +173,7 @@ select{font:inherit;padding:6px 8px;border-radius:10px;border:1px solid #d9cfdc;
     <div>
       <h4>Your voice for <span id="pDay">Lesson 1</span>: <span id="pHan" style="font-family:var(--han)">猫</span></h4>
       <div class="slot"><span>Character <span id="stC"></span></span><span class="row"><button class="sb rec" id="recC">🎙 Record</button><button class="sb ghost" id="tryC">Play</button><button class="sb ghost" id="saveC">Save file</button></span></div>
-      <div class="slot" style="margin-top:6px"><span>Sentence <span id="stS"></span></span><span class="row"><button class="sb rec" id="recS">🎙 Record</button><button class="sb ghost" id="trySentP">Play</button><button class="sb ghost" id="saveS">Save file</button></span></div>
+      <div class="slot" style="margin-top:6px"><span>Sentence or dialogue <span id="stS"></span></span><span class="row"><button class="sb rec" id="recS">🎙 Record</button><button class="sb ghost" id="trySentP">Play</button><button class="sb ghost" id="saveS">Save file</button></span></div>
       <p class="help" style="margin-top:6px">A new recording plays right away on this phone. To let it play on every phone and computer, tap <b>Save file</b>, then upload that file to the <b>voice</b> folder of your GitHub repo (or send it to Claude). Keep the file name it gives you, like <code id="fnHint">day01-char.m4a</code>.</p>
       <div class="row" style="margin-top:6px"><button class="sb ghost" id="upC">Use a file for character</button><button class="sb ghost" id="upS">Use a file for sentence</button></div>
     </div>
@@ -222,8 +227,68 @@ const L=[
 ["家","jiā","home","🏠","我爱我家。","Wǒ ài wǒ jiā.","I love my home."],
 ["笑","xiào","laugh","😄","宝宝笑哈哈。","Bǎobao xiào hāhā.","Baby laughs ha ha."],
 ["人","rén","person","🧒","我是好人。","Wǒ shì hǎo rén.","I am a good person."],
-["爱","ài","love","❤️","我爱你。","Wǒ ài nǐ.","I love you."]
+["爱","ài","love","❤️","我爱你。","Wǒ ài nǐ.","I love you."],
+/* Level 2 */
+["我","wǒ","I, me","👧","我是好孩子。","Wǒ shì hǎo háizi.","I am a good kid."],
+["你","nǐ","you","🤝","你是我的好朋友。","Nǐ shì wǒ de hǎo péngyou.","You are my good friend."],
+["他","tā","he","👦","他在公园里玩。","Tā zài gōngyuán lǐ wán.","He is playing in the park."],
+["们","men","(more than one)","👨‍👩‍👧","我们是一家人。","Wǒmen shì yì jiā rén.","We are one family."],
+["吃","chī","eat","🍜","我喜欢吃面条。","Wǒ xǐhuan chī miàntiáo.","I like eating noodles."],
+["喝","hē","drink","🥛","早上我喝牛奶。","Zǎoshang wǒ hē niúnǎi.","I drink milk in the morning."],
+["看","kàn","look, watch","🔭","我们一起看月亮。","Wǒmen yìqǐ kàn yuèliang.","Let's look at the moon together."],
+["听","tīng","listen","🎵","我喜欢听妈妈唱歌。","Wǒ xǐhuan tīng māma chàng gē.","I like listening to Mommy sing."],
+["说","shuō","speak","🗣️","请你慢慢说。","Qǐng nǐ mànmàn shuō.","Please speak slowly."],
+["走","zǒu","walk","🚶","我们走路去学校。","Wǒmen zǒu lù qù xuéxiào.","We walk to school."],
+["跑","pǎo","run","🏃","小狗跑得很快。","Xiǎo gǒu pǎo de hěn kuài.","The puppy runs very fast."],
+["红","hóng","red","🍓","草莓是红色的。","Cǎoméi shì hóngsè de.","Strawberries are red."],
+["白","bái","white","🐑","小羊是白色的。","Xiǎo yáng shì báisè de.","The little lamb is white."],
+["天","tiān","sky, day","🌤️","今天天气真好。","Jīntiān tiānqì zhēn hǎo.","The weather is lovely today."],
+["风","fēng","wind","🌬️","风吹树叶沙沙响。","Fēng chuī shùyè shāshā xiǎng.","The wind makes the leaves rustle."],
+["树","shù","tree","🌳","树上有一只小鸟。","Shù shàng yǒu yì zhī xiǎo niǎo.","There is a little bird in the tree."],
+["草","cǎo","grass","🌱","小羊在吃青草。","Xiǎo yáng zài chī qīng cǎo.","The lamb is eating green grass."],
+["门","mén","door","🚪","请你关上门。","Qǐng nǐ guān shang mén.","Please close the door."],
+["朋","péng","friend","🧸","我有很多好朋友。","Wǒ yǒu hěn duō hǎo péngyou.","I have lots of good friends."],
+["学","xué","learn","✏️","我每天学一个字。","Wǒ měitiān xué yí ge zì.","I learn one character every day."],
+/* Level 3 */
+["校","xiào","school","🏫","我的学校有一个大操场。","Wǒ de xuéxiào yǒu yí ge dà cāochǎng.","My school has a big playground."],
+["老","lǎo","old; teacher (老师)","👩‍🏫","老师今天给我们讲故事。","Lǎoshī jīntiān gěi wǒmen jiǎng gùshi.","The teacher told us a story today."],
+["春","chūn","spring","🌷","春天来了，花儿都开了。","Chūntiān lái le, huā'ér dōu kāi le.","Spring is here, and the flowers are blooming."],
+["夏","xià","summer","🏖️","夏天我们去海边玩水。","Xiàtiān wǒmen qù hǎibiān wán shuǐ.","In summer we splash at the beach."],
+["秋","qiū","autumn","🍁","秋天的树叶变黄了。","Qiūtiān de shùyè biàn huáng le.","In autumn the leaves turn yellow."],
+["冬","dōng","winter","⛄","冬天下雪，我们堆雪人。","Dōngtiān xià xuě, wǒmen duī xuěrén.","When it snows in winter, we build a snowman."],
+["唱","chàng","sing","🎤","我们一起唱一首好听的歌。","Wǒmen yìqǐ chàng yì shǒu hǎotīng de gē.","Let's sing a pretty song together."],
+["画","huà","draw","🎨","我画了一只穿裙子的小猫。","Wǒ huà le yì zhī chuān qúnzi de xiǎo māo.","I drew a kitty wearing a dress."],
+["飞","fēi","fly","✈️","飞机飞过高高的天空。","Fēijī fēi guò gāogāo de tiānkōng.","The plane flies across the high sky."],
+["睡","shuì","sleep","😴","晚上九点，我该睡觉了。","Wǎnshang jiǔ diǎn, wǒ gāi shuìjiào le.","It's nine o'clock, time for bed."],
+["洗","xǐ","wash","🧼","吃饭以前要先洗手。","Chī fàn yǐqián yào xiān xǐ shǒu.","Wash your hands before eating."],
+["穿","chuān","wear","🧥","天冷了，要多穿一件衣服。","Tiān lěng le, yào duō chuān yí jiàn yīfu.","It's cold, so put on another layer."],
+["快","kuài","fast; happy (快乐)","🎂","祝你生日快乐！","Zhù nǐ shēngrì kuàilè!","Happy birthday to you!"],
+["乐","lè","happy","🥳","和朋友一起玩，我很快乐。","Hé péngyou yìqǐ wán, wǒ hěn kuàilè.","Playing with friends makes me happy."],
+["想","xiǎng","want, think","💭","我想去动物园看大熊猫。","Wǒ xiǎng qù dòngwùyuán kàn dà xióngmāo.","I want to see the pandas at the zoo."],
+["哭","kū","cry","😢","小妹妹摔倒了，哭得很伤心。","Xiǎo mèimei shuāi dǎo le, kū de hěn shāngxīn.","Little sister fell down and cried hard."],
+["谢","xiè","thank","🙏","谢谢你帮我捡起书包。","Xièxie nǐ bāng wǒ jiǎn qǐ shūbāo.","Thank you for picking up my backpack."],
+["晚","wǎn","evening","🌆","晚上我们一家人一起吃饭。","Wǎnshang wǒmen yì jiā rén yìqǐ chī fàn.","In the evening our family eats together."],
+["节","jié","holiday","🎃","万圣节我要打扮成小猫。","Wànshèngjié wǒ yào dǎban chéng xiǎo māo.","For Halloween I'll dress up as a kitty."],
+["礼","lǐ","gift (礼物)","🎁","圣诞节我收到了一个大礼物。","Shèngdànjié wǒ shōu dào le yí ge dà lǐwù.","I got a big present for Christmas."],
+/* Level 4: dialogues. A = Angelina, M = Mom */
+["早","zǎo","morning","🌞",null,null,null,[["M","宝贝，早上好！","Bǎobèi, zǎoshang hǎo!","Good morning, sweetie!"],["A","妈妈早！我起床了。","Māma zǎo! Wǒ qǐchuáng le.","Morning, Mom! I'm up."]]],
+["饿","è","hungry","🥟",null,null,null,[["A","妈妈，我饿了。","Māma, wǒ è le.","Mom, I'm hungry."],["M","我们吃饺子好不好？","Wǒmen chī jiǎozi hǎo bu hǎo?","Shall we have dumplings?"],["A","好！我最爱吃饺子！","Hǎo! Wǒ zuì ài chī jiǎozi!","Yes! I love dumplings!"]]],
+["玩","wán","play","🛝",null,null,null,[["A","妈妈，我可以出去玩吗？","Māma, wǒ kěyǐ chūqù wán ma?","Mom, can I go out and play?"],["M","可以，先把作业写完。","Kěyǐ, xiān bǎ zuòyè xiě wán.","Yes, after you finish your homework."]]],
+["冷","lěng","cold","🧣",null,null,null,[["M","外面很冷，戴上围巾吧。","Wàimiàn hěn lěng, dài shang wéijīn ba.","It's cold outside. Put on your scarf."],["A","好的，我还要戴帽子。","Hǎo de, wǒ hái yào dài màozi.","Okay, and my hat too."]]],
+["疼","téng","hurt","🩹",null,null,null,[["A","妈妈，我的膝盖好疼。","Māma, wǒ de xīgài hǎo téng.","Mom, my knee really hurts."],["M","别怕，妈妈给你贴个创可贴。","Bié pà, māma gěi nǐ tiē ge chuàngkětiē.","Don't worry, I'll put a bandage on it."]]],
+["猜","cāi","guess","🎁",null,null,null,[["M","猜猜盒子里是什么？","Cāicai hézi lǐ shì shénme?","Guess what's in the box?"],["A","是一只小猫玩具吗？","Shì yì zhī xiǎo māo wánjù ma?","Is it a toy kitty?"],["M","猜对了！","Cāi duì le!","You guessed it!"]]],
+["帮","bāng","help","🧺",null,null,null,[["A","妈妈，我来帮你拿东西。","Māma, wǒ lái bāng nǐ ná dōngxi.","Mom, let me help you carry things."],["M","谢谢宝贝，你真能干！","Xièxie bǎobèi, nǐ zhēn nénggàn!","Thanks, sweetie, you're so capable!"]]],
+["买","mǎi","buy","🛒",null,null,null,[["A","我们去超市买什么？","Wǒmen qù chāoshì mǎi shénme?","What are we buying at the store?"],["M","买牛奶、鸡蛋和苹果。","Mǎi niúnǎi, jīdàn hé píngguǒ.","Milk, eggs, and apples."]]],
+["怕","pà","afraid","🌩️",null,null,null,[["A","打雷了，我有点儿怕。","Dǎléi le, wǒ yǒudiǎnr pà.","It's thundering. I'm a little scared."],["M","不怕不怕，妈妈抱着你。","Bú pà bú pà, māma bào zhe nǐ.","Don't be scared, Mommy's holding you."]]],
+["讲","jiǎng","tell","📖",null,null,null,[["A","妈妈，给我讲个故事吧。","Māma, gěi wǒ jiǎng ge gùshi ba.","Mom, tell me a story."],["M","好，从前有一只小猫……","Hǎo, cóngqián yǒu yì zhī xiǎo māo……","Okay. Once upon a time there was a kitty…"]]],
+["忘","wàng","forget","🎒",null,null,null,[["M","你的书包呢？","Nǐ de shūbāo ne?","Where's your backpack?"],["A","哎呀，我忘在学校了！","Āiyā, wǒ wàng zài xuéxiào le!","Oops, I left it at school!"]]],
+["最","zuì","most","🍦",null,null,null,[["M","你最喜欢什么颜色？","Nǐ zuì xǐhuan shénme yánsè?","What's your favorite color?"],["A","我最喜欢粉红色，像草莓冰淇淋。","Wǒ zuì xǐhuan fěnhóngsè, xiàng cǎoméi bīngqílín.","Pink, like strawberry ice cream."]]],
+["岁","suì","years old","🧸",null,null,null,[["M","你的小猫玩具几岁了？","Nǐ de xiǎo māo wánjù jǐ suì le?","How old is your toy kitty?"],["A","它两岁了，是个小宝宝。","Tā liǎng suì le, shì ge xiǎo bǎobao.","She's two. She's a little baby."]]],
+["梦","mèng","dream","🌙",null,null,null,[["M","晚安，宝贝，做个好梦。","Wǎn'ān, bǎobèi, zuò ge hǎo mèng.","Good night, sweetie. Sweet dreams."],["A","晚安妈妈，我会梦到小猫。","Wǎn'ān māma, wǒ huì mèng dào xiǎo māo.","Good night, Mom. I'll dream about kitties."]]],
+["永","yǒng","forever","💞",null,null,null,[["A","妈妈，我爱你。","Māma, wǒ ài nǐ.","Mom, I love you."],["M","妈妈也爱你，永远爱你。","Māma yě ài nǐ, yǒngyuǎn ài nǐ.","Mommy loves you too, forever and ever."]]]
 ];
+const LEVELS=[[0,"Level 1 · 入门"],[30,"Level 2 · 日常"],[50,"Level 3 · 长句子"],[70,"Level 4 · 对话 with Mom"]];
+const levelOf=i=>LEVELS.filter(l=>i>=l[0]).length;
 
 const SEASONS={
  auto:{name:"Auto (by date)"},
@@ -248,6 +313,7 @@ const HATS={
 };
 
 const $=id=>document.getElementById(id);
+const esc=t=>String(t).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
 const ls={get(k,d){try{const v=localStorage.getItem(k);return v==null?d:JSON.parse(v)}catch(e){return d}},set(k,v){try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}}};
 
 /* IndexedDB for audio blobs */
@@ -296,14 +362,21 @@ function applyTheme(){
 }
 
 function render(){
-  const [h,py,mean,pic,zh,spy,en]=L[cur];
+  const [h,py,mean,pic,zh,spy,en,dlg]=L[cur];
   ls.set("cur",cur);
-  $("dayLabel").textContent="第 "+(cur+1)+" 课 · Lesson "+(cur+1);
+  $("dayLabel").textContent="第 "+(cur+1)+" 课 · Level "+levelOf(cur);
   $("han").textContent=h;$("py").textContent=py;$("mean").textContent=mean;$("pic").textContent=pic;
-  $("zh").innerHTML=[...zh].map(c=>c===h?"<b>"+c+"</b>":c).join("");
-  $("spy").textContent=spy;$("en").textContent=en;
+  const mark=t=>esc(t).split(h).join("<b>"+h+"</b>");
+  if(dlg){
+    $("sentBody").innerHTML=dlg.map(([w,z,p,e])=>'<div class="line '+(w==="A"?"a":"m")+'"><span class="who">'+(w==="A"?"Angelina":"妈妈 Mom")+'</span><div class="zh">'+mark(z)+'</div><div class="spy">'+esc(p)+'</div><div class="en">'+esc(e)+'</div></div>').join("");
+    $("playSent").textContent="🔊 对话";
+  }else{
+    $("sentBody").innerHTML='<div class="zh">'+mark(zh)+'</div><div class="spy">'+esc(spy)+'</div><div class="en">'+esc(en)+'</div>';
+    $("playSent").textContent="🔊 句子";
+  }
   const u=unlocked(),t=$("tiles");t.innerHTML="";
-  L.forEach((l,i)=>{const b=document.createElement("button");b.className="tile"+(i===cur?" cur":"")+(done.includes(i)?" done":"");
+  L.forEach((l,i)=>{const lv=LEVELS.find(x=>x[0]===i);if(lv){const hd=document.createElement("div");hd.className="lvl";hd.textContent=lv[1];t.appendChild(hd)}
+    const b=document.createElement("button");b.className="tile"+(i===cur?" cur":"")+(done.includes(i)?" done":"");
     b.disabled=i>=u;b.textContent=i<u?l[0]:"?";b.setAttribute("aria-label",i<u?"Lesson "+(i+1)+" "+l[0]:"Locked");
     b.onclick=()=>{cur=i;render();refreshParent()};t.appendChild(b)});
   $("learned").textContent=done.includes(cur)?"⭐ 学会啦！Learned!":"⭐ 我学会了！";
@@ -315,10 +388,10 @@ function render(){
 const player=new Audio();let music=new Audio();music.loop=true;music.volume=.3;
 let lastURL=null;
 function duck(on){music.volume=on?.08:.3}
-function speak(text){
+function speak(text,pitch){
   return new Promise(r=>{
     if(!("speechSynthesis" in window)){$("note").textContent="This browser has no built-in voice.";return r()}
-    speechSynthesis.cancel();const u=new SpeechSynthesisUtterance(text);u.lang="zh-CN";u.rate=.75;
+    speechSynthesis.cancel();const u=new SpeechSynthesisUtterance(text);u.lang="zh-CN";u.rate=.75;if(pitch)u.pitch=pitch;
     const vs=speechSynthesis.getVoices().filter(v=>/^zh(-|_)?(CN|Hans)?/i.test(v.lang));
     const pick=vs.find(v=>/premium|enhanced/i.test(v.name))||vs.find(v=>/CN/i.test(v.lang))||vs[0];if(pick)u.voice=pick;
     u.onend=r;u.onerror=r;duck(true);speechSynthesis.speak(u);
@@ -352,10 +425,11 @@ async function playKey(key,text){
       player.onended=()=>duck(false);try{await player.play();return}catch(e){duck(false)}}
     $("note").textContent="Mom hasn't recorded this one yet, so the robot is reading it.";
   }
-  return speak(text);
+  return typeof text==="function"?text():speak(text);
 }
 const sayChar=()=>{$("tzg").classList.remove("pop");void $("tzg").offsetWidth;$("tzg").classList.add("pop");playKey("v-"+cur+"-c",L[cur][0])};
-const saySent=()=>playKey("v-"+cur+"-s",L[cur][4]);
+const sentText=i=>L[i][7]?async()=>{for(const [w,z] of L[i][7]){await speak(z,w==="A"?1.5:1)}}:L[i][4];
+const saySent=()=>playKey("v-"+cur+"-s",sentText(cur));
 $("tzg").onclick=sayChar;$("playChar").onclick=sayChar;$("sent").onclick=saySent;$("playSent").onclick=saySent;
 $("vMom").onclick=()=>{voice="mom";ls.set("voice",voice);render()};
 $("vBot").onclick=()=>{voice="bot";ls.set("voice",voice);render()};
@@ -402,7 +476,7 @@ $("upC").onclick=()=>pick("v-"+cur+"-c");$("upS").onclick=()=>pick("v-"+cur+"-s"
 $("upM").onclick=()=>pick("m-"+season());$("upMA").onclick=()=>pick("m-all");
 $("clrM").onclick=async()=>{await put("m-"+season(),null);refreshParent()};
 $("tryC").onclick=async()=>{const v=voice;voice="mom";await playKey("v-"+cur+"-c",L[cur][0]);voice=v};
-$("trySentP").onclick=async()=>{const v=voice;voice="mom";await playKey("v-"+cur+"-s",L[cur][4]);voice=v};
+$("trySentP").onclick=async()=>{const v=voice;voice="mom";await playKey("v-"+cur+"-s",sentText(cur));voice=v};
 
 /* recording with the microphone */
 let rec=null,recKey=null,chunks=[];
