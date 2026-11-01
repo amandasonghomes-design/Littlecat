@@ -112,6 +112,12 @@ button:focus-visible{outline:3px solid var(--accent2);outline-offset:2px}
 .tile.done::after{content:"★";position:absolute;top:-6px;right:-4px;font-size:12px;color:var(--accent)}
 .tile:disabled{color:#c9c0cf;background:#f4f1f5;cursor:default}
 
+.secret{position:relative;align-self:flex-start;border:0;background:none;font-size:20px;opacity:.28;padding:6px;cursor:pointer;line-height:1;margin-bottom:-38px}
+.secret::after{content:"";position:absolute;inset:-6px}
+.secret.wiggle{opacity:1;animation:wig .6s}
+@keyframes wig{25%{transform:rotate(-15deg) scale(1.4)}75%{transform:rotate(15deg) scale(1.4)}}
+.heart{position:fixed;z-index:7;pointer-events:none;font-size:26px;animation:heartup 1.6s ease-out forwards}
+@keyframes heartup{to{transform:translate(var(--dx),-220px) scale(1.3);opacity:0}}
 .parentbtn{align-self:center;border:0;background:rgba(255,255,255,.6);border-radius:999px;padding:8px 16px;font-family:var(--display);font-size:14px;cursor:pointer;color:var(--ink)}
 .drawer{position:fixed;inset:auto 0 0 0;z-index:5;background:#fffdf9;border-radius:24px 24px 0 0;max-height:86%;overflow:auto;box-shadow:0 -10px 40px rgba(0,0,0,.3);
   padding:16px max(16px,env(safe-area-inset-right,0px)) calc(20px + env(safe-area-inset-bottom,0px)) max(16px,env(safe-area-inset-left,0px))}
@@ -175,6 +181,7 @@ select{font:inherit;padding:6px 8px;border-radius:10px;border:1px solid #d9cfdc;
     <div class="tiles" id="tiles"></div>
   </section>
 
+  <button class="secret" id="secretBaby" aria-label="A little surprise">👶</button>
   <button class="parentbtn" id="openParent">For Mom ⚙︎</button>
 </div>
 
@@ -557,6 +564,17 @@ $("baby").onclick=()=>{try{speechSynthesis.cancel()}catch(e){}player.pause();sec
   const r=bt.getBoundingClientRect();for(let i=0;i<8;i++){const s=document.createElement("span");s.className="burst";s.textContent=["💖","💕"][i%2];
   s.style.left=(r.left+10)+"px";s.style.top=r.top+"px";const a=-Math.PI*(i/7);s.style.setProperty("--dx",Math.cos(a)*90+"px");s.style.setProperty("--dy",Math.sin(a)*90+"px");
   document.body.appendChild(s);setTimeout(()=>s.remove(),1100)}};
+/* secret baby: plays Love You Mama */
+const love=new Audio("voice/love-you-mama.mp3");love.preload="auto";
+$("secretBaby").onclick=e=>{
+  const b=e.currentTarget;try{speechSynthesis.cancel()}catch(x){}
+  love.currentTime=0;duck(true);love.onended=()=>duck(false);love.play().catch(()=>duck(false));
+  b.classList.remove("wiggle");void b.offsetWidth;b.classList.add("wiggle");setTimeout(()=>b.classList.remove("wiggle"),650);
+  const r=b.getBoundingClientRect();
+  for(let i=0;i<8;i++){const h=document.createElement("span");h.className="heart";h.textContent=["💖","💕","❤️"][i%3];
+    h.style.left=(r.left+r.width/2-12)+"px";h.style.top=(r.top)+"px";h.style.setProperty("--dx",(Math.random()*160-80)+"px");
+    h.style.animationDelay=(i*0.08)+"s";document.body.appendChild(h);setTimeout(()=>h.remove(),2000)}
+};
 applyTheme();render();
 </script>
 </body>
