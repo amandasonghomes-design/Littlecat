@@ -194,8 +194,14 @@ select{font:inherit;padding:6px 8px;border-radius:10px;border:1px solid #d9cfdc;
       <h4>Your voice for <span id="pDay">Lesson 1</span>: <span id="pHan" style="font-family:var(--han)">猫</span></h4>
       <div class="slot"><span>Character <span id="stC"></span></span><span class="row"><button class="sb rec" id="recC">🎙 Record</button><button class="sb ghost" id="tryC">Play</button><button class="sb ghost" id="saveC">Save file</button></span></div>
       <div class="slot" style="margin-top:6px"><span>Sentence or dialogue <span id="stS"></span></span><span class="row"><button class="sb rec" id="recS">🎙 Record</button><button class="sb ghost" id="trySentP">Play</button><button class="sb ghost" id="saveS">Save file</button></span></div>
-      <p class="help" style="margin-top:6px">A new recording plays right away on this phone. To let it play on every phone and computer, tap <b>Save file</b>, then upload that file to the <b>voice</b> folder of your GitHub repo (or send it to Claude). Keep the file name it gives you, like <code id="fnHint">day01-char.m4a</code>.</p>
+      <p class="help" style="margin-top:6px">When you tap Stop, the recording saves to the server by itself, so it plays on every phone and computer within about a minute. <b>Save file</b> keeps a copy for you, named like <code id="fnHint">day01-char.m4a</code>.</p>
       <div class="row" style="margin-top:6px"><button class="sb ghost" id="upC">Use a file for character</button><button class="sb ghost" id="upS">Use a file for sentence</button></div>
+    </div>
+
+    <div>
+      <h4>Auto-save to server</h4>
+      <div class="row"><input id="srvPw" type="password" placeholder="Server password" autocomplete="current-password" style="font:inherit;padding:8px 10px;border-radius:10px;border:1px solid #d9cfdc;flex:1;min-width:0"><button class="sb" id="srvSave">Save</button></div>
+      <p class="help" id="srvInfo">Type the server password once. After that, every recording uploads by itself when you tap Stop.</p>
     </div>
 
     <div>
@@ -501,7 +507,25 @@ let pending=null;
 $("openParent").onclick=()=>{$("drawer").hidden=false;refreshParent()};
 $("closeParent").onclick=()=>{$("drawer").hidden=true};
 function pick(key){pending=key;$("file").value="";$("file").click()}
-$("file").onchange=async e=>{const f=e.target.files[0];if(!f||!pending)return;const ok=await put(pending,f);
+/* auto-upload Mom's recordings to the server */
+const upState={};
+function pw(){return ls.get("srvPw","")}
+$("srvPw").value=pw();
+$("srvSave").onclick=()=>{ls.set("srvPw",$("srvPw").value.trim());$("srvInfo").textContent=pw()?"Saved. New recordings will upload by themselves.":"Password cleared. Recordings will stay on this phone.";};
+function b64(blob){return new Promise((r,j)=>{const f=new FileReader();f.onload=()=>r(String(f.result).split(",")[1]);f.onerror=j;f.readAsDataURL(blob)})}
+async function autoUpload(key,blob){
+  if(!key.startsWith("v-"))return;
+  if(!pw()){upState[key]="nopw";refreshParent();return}
+  const name=baseName(key).split("/")[1]+"."+extFor(blob.type);
+  upState[key]="up";refreshParent();
+  try{
+    const r=await fetch("api/upload",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({password:pw(),name,data:await b64(blob)})});
+    const j=await r.json().catch(()=>({}));
+    if(r.ok){upState[key]="ok";remoteCache[key]="voice/"+name}else{upState[key]="err:"+(j.error||("Error "+r.status))}
+  }catch(e){upState[key]="err:No internet connection. It's saved on this phone; record again later to upload."}
+  refreshParent();
+}
+$("file").onchange=async e=>{const f=e.target.files[0];if(!f||!pending)return;const ok=await put(pending,f);if(ok)autoUpload(pending,f);
   if(!ok)alertNote("Couldn't save on this device. Private browsing can block saving.");refreshParent();pending=null};
 function alertNote(t){$("note").textContent=t}
 $("upC").onclick=()=>pick("v-"+cur+"-c");$("upS").onclick=()=>pick("v-"+cur+"-s");
@@ -521,7 +545,7 @@ async function toggleRec(key,btn){
   rec=new MediaRecorder(stream,type?{mimeType:type}:undefined);recKey=key;chunks=[];
   rec.ondataavailable=e=>{if(e.data.size)chunks.push(e.data)};
   rec.onstop=async()=>{stream.getTracks().forEach(t=>t.stop());btn.classList.remove("on");btn.textContent="🎙 Record";
-    const blob=new Blob(chunks,{type:rec.mimeType||type||"audio/mp4"});await put(recKey,blob);refreshParent();
+    const blob=new Blob(chunks,{type:rec.mimeType||type||"audio/mp4"});await put(recKey,blob);refreshParent();autoUpload(recKey,blob);
     player.src=URL.createObjectURL(blob);player.play().catch(()=>{});};
   rec.start();btn.classList.add("on");btn.textContent="■ Stop";
 }
@@ -538,7 +562,12 @@ $("saveC").onclick=()=>saveFile("v-"+cur+"-c");$("saveS").onclick=()=>saveFile("
 async function refreshParent(){
   $("pDay").textContent="Lesson "+(cur+1);$("pHan").textContent=L[cur][0];
   $("fnHint").textContent=baseName("v-"+cur+"-c").split("/")[1]+".m4a";
-  const mark=async(id,k)=>{const loc=await get(k),rem=await remote(k);
+  const mark=async(id,k)=>{const st=upState[k];
+    if(st==="up"){$(id).innerHTML='<span style="color:#9a8aa5">⏳ saving to server…</span>';return}
+    if(st==="ok"){$(id).innerHTML='<span class="ok">✓ saved to server</span>';return}
+    if(st==="nopw"){$(id).innerHTML='<span style="color:#c4512a">· on this phone only. Add the server password below.</span>';return}
+    if(st&&st.startsWith("err:")){$(id).innerHTML='<span style="color:#c4512a">· '+esc(st.slice(4))+'</span>';return}
+    const loc=await get(k),rem=await remote(k);
     $(id).innerHTML=rem?'<span class="ok">✓ on website</span>'+(loc?' <span class="ok">+ new on this phone</span>':''):loc?'<span class="ok">✓ on this phone</span>':'<span style="color:#9a8aa5">· not yet</span>'};
   mark("stC","v-"+cur+"-c");mark("stS","v-"+cur+"-s");
   const m=await get("m-"+season())||(await remote("m-"+season())?{name:"on website"}:null);$("stM").innerHTML=m?'<span class="ok">✓ '+(m.name||"song")+'</span>':'<span style="color:#9a8aa5">· none</span>';
