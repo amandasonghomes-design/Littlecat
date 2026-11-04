@@ -435,13 +435,16 @@ function baseName(key){
   const [,d,t]=key.split("-");return "voice/day"+String(+d+1).padStart(2,"0")+"-"+(t==="c"?"char":"sentence");
 }
 const remoteCache={};
+const remoteMiss={};
 async function remote(key){
-  if(key in remoteCache)return remoteCache[key];
+  if(remoteCache[key])return remoteCache[key];
+  if(remoteMiss[key]&&Date.now()-remoteMiss[key]<15000)return null;
   remoteCache[key]=null;
   for(const e of EXTS){
     const u=baseName(key)+"."+e;
-    try{const r=await fetch(u,{method:"HEAD",cache:"no-cache"});if(r.ok){remoteCache[key]=u;break}}catch(err){}
+    try{const r=await fetch(u,{method:"HEAD",cache:"no-store"});if(r.ok){remoteCache[key]=u;break}}catch(err){}
   }
+  if(!remoteCache[key])remoteMiss[key]=Date.now();
   return remoteCache[key];
 }
 async function srcFor(key){
