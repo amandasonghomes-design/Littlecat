@@ -442,15 +442,22 @@ async function remote(key){
   remoteCache[key]=null;
   for(const e of EXTS){
     const u=baseName(key)+"."+e;
-    try{const r=await fetch(u,{method:"HEAD",cache:"no-store"});if(r.ok){remoteCache[key]=u;break}}catch(err){}
+    try{const r=await fetch(u,{method:"HEAD",cache:"no-store"});if(r.ok){const v=(r.headers.get("etag")||r.headers.get("last-modified")||"").replace(/[^\w]/g,"").slice(-16);remoteCache[key]=v?u+"?v="+v:u;break}}catch(err){}
   }
   if(!remoteCache[key])remoteMiss[key]=Date.now();
   return remoteCache[key];
 }
+/* the server copy wins; a copy on this device only plays if there is none on the server,
+   or if it was just recorded here (the website takes a minute or two to update) */
+const FRESH=15*60*1000;
 async function srcFor(key){
-  const b=await get(key);
-  if(b){if(lastURL)URL.revokeObjectURL(lastURL);lastURL=URL.createObjectURL(b);return lastURL}
-  return remote(key);
+  const rem=await remote(key);
+  const ts=ls.get("recAt-"+key,0);
+  if(!rem||Date.now()-ts<FRESH){
+    const b=await get(key);
+    if(b){if(lastURL)URL.revokeObjectURL(lastURL);lastURL=URL.createObjectURL(b);return lastURL}
+  }
+  return rem;
 }
 async function playKey(key,text){
   if(voice==="mom"){
@@ -528,7 +535,7 @@ async function autoUpload(key,blob){
   }catch(e){upState[key]="err:No internet connection. It's saved on this phone; record again later to upload."}
   refreshParent();
 }
-$("file").onchange=async e=>{const f=e.target.files[0];if(!f||!pending)return;const ok=await put(pending,f);if(ok)autoUpload(pending,f);
+$("file").onchange=async e=>{const f=e.target.files[0];if(!f||!pending)return;const ok=await put(pending,f);if(ok){ls.set("recAt-"+pending,Date.now());autoUpload(pending,f)}
   if(!ok)alertNote("Couldn't save on this device. Private browsing can block saving.");refreshParent();pending=null};
 function alertNote(t){$("note").textContent=t}
 $("upC").onclick=()=>pick("v-"+cur+"-c");$("upS").onclick=()=>pick("v-"+cur+"-s");
@@ -548,7 +555,7 @@ async function toggleRec(key,btn){
   rec=new MediaRecorder(stream,type?{mimeType:type}:undefined);recKey=key;chunks=[];
   rec.ondataavailable=e=>{if(e.data.size)chunks.push(e.data)};
   rec.onstop=async()=>{stream.getTracks().forEach(t=>t.stop());btn.classList.remove("on");btn.textContent="🎙 Record";
-    const blob=new Blob(chunks,{type:rec.mimeType||type||"audio/mp4"});await put(recKey,blob);refreshParent();autoUpload(recKey,blob);
+    const blob=new Blob(chunks,{type:rec.mimeType||type||"audio/mp4"});await put(recKey,blob);ls.set("recAt-"+recKey,Date.now());refreshParent();autoUpload(recKey,blob);
     player.src=URL.createObjectURL(blob);player.play().catch(()=>{});};
   rec.start();btn.classList.add("on");btn.textContent="■ Stop";
 }
