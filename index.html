@@ -10,7 +10,7 @@
 <link rel="apple-touch-icon" href="img/cat-icon.png">
 <title>Little Cat Chinese</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;700;800&family=Noto+Sans+SC:wght@400;700&family=Noto+Serif+SC:wght@700&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;700;800&family=Noto+Sans:wght@500;600&family=Noto+Sans+SC:wght@400;700&family=Noto+Serif+SC:wght@700&display=swap">
 <style>
 /* Layout: one daily card centered on a seasonal "sky"; review shelf below; parent drawer slides up. Each season is a fixed palette (single-theme by design). */
 :root{
@@ -18,6 +18,7 @@
   --accent:#ff8a1f; --accent2:#7cd36b; --grid:#e8b9b0; --chip:#ffffff;
   --display:"Baloo 2","Arial Rounded MT Bold",system-ui,sans-serif;
   --han:"Noto Serif SC","Kaiti SC","STKaiti","Songti SC",serif;
+  --pinyin:"Noto Sans","Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;
   --body:"Noto Sans SC","PingFang SC",system-ui,sans-serif;
   color-scheme:light;
 }
@@ -47,7 +48,7 @@ body{margin:0;background:linear-gradient(170deg,var(--sky1),var(--sky2));backgro
 .top{display:flex;align-items:center;justify-content:space-between;gap:8px}
 .day{font-family:var(--display);font-weight:800;font-size:20px;color:#fff;background:rgba(0,0,0,.25);padding:4px 14px;border-radius:999px;letter-spacing:.02em}
 [data-season="spring"] .day,[data-season="summer"] .day,[data-season="winter"] .day{background:rgba(255,255,255,.7);color:var(--ink)}
-.icons{display:flex;gap:16px}
+.icons{display:flex;gap:12px}
 .ib{width:36px;height:36px;border-radius:50%;border:0;background:rgba(255,255,255,.8);font-size:16px;cursor:pointer;display:grid;place-items:center;position:relative;padding:0}
 .ib::after{content:"";position:absolute;inset:-5px}
 .ib[aria-pressed="false"]{opacity:.55}
@@ -88,12 +89,12 @@ button:focus-visible{outline:3px solid var(--accent2);outline-offset:2px}
 .sent .en{font-family:var(--display);font-size:15px;color:var(--soft);opacity:.85}
 
 .play{display:flex;gap:10px;width:100%}
-.big{flex:1;border:0;border-radius:18px;padding:12px;font-family:var(--display);font-weight:800;font-size:18px;cursor:pointer;color:#fff;background:var(--accent);box-shadow:0 5px 0 rgba(0,0,0,.18)}
+.big{display:flex;flex-direction:column;align-items:center;gap:1px;line-height:1.15;flex:1;border:0;border-radius:18px;padding:12px;font-family:var(--display);font-weight:800;font-size:18px;cursor:pointer;color:#fff;background:var(--accent);box-shadow:0 5px 0 rgba(0,0,0,.18)}
 .big.alt{background:var(--accent2)}
 .big:active{transform:translateY(3px);box-shadow:0 2px 0 rgba(0,0,0,.18)}
 
 .voice{display:flex;background:rgba(255,255,255,.85);border-radius:999px;padding:4px;align-self:center;gap:4px}
-.voice button{border:0;background:transparent;border-radius:999px;padding:8px 16px;font-family:var(--display);font-weight:700;font-size:16px;cursor:pointer;color:var(--ink)}
+.voice button{display:flex;flex-direction:column;align-items:center;line-height:1.15;border:0;background:transparent;border-radius:999px;padding:8px 16px;font-family:var(--display);font-weight:700;font-size:16px;cursor:pointer;color:var(--ink)}
 .voice button[aria-pressed="true"]{background:var(--accent);color:#fff}
 .note{font-family:var(--display);font-size:13px;color:#fff;text-align:center;min-height:18px;text-shadow:0 1px 2px rgba(0,0,0,.4)}
 [data-season="spring"] .note,[data-season="summer"] .note,[data-season="winter"] .note{color:var(--ink);text-shadow:none}
@@ -118,6 +119,17 @@ button:focus-visible{outline:3px solid var(--accent2);outline-offset:2px}
 @keyframes wig{25%{transform:rotate(-15deg) scale(1.4)}75%{transform:rotate(15deg) scale(1.4)}}
 .heart{position:fixed;z-index:7;pointer-events:none;font-size:26px;animation:heartup 1.6s ease-out forwards}
 @keyframes heartup{to{transform:translate(var(--dx),-220px) scale(1.3);opacity:0}}
+.big small,.voice button small,.ibw small,.day small{display:block;font-family:var(--display);font-weight:600;font-size:12px;letter-spacing:.01em;opacity:.92}
+.big small{font-size:13px}
+.voice button small{font-size:11px;opacity:.8}
+.ibw{display:flex;flex-direction:column;align-items:center;gap:3px}
+.ibw small{font-size:10.5px;color:#fff;text-shadow:0 1px 2px rgba(0,0,0,.4)}
+[data-season="spring"] .ibw small,[data-season="summer"] .ibw small,[data-season="winter"] .ibw small{color:var(--ink);text-shadow:none}
+.day{line-height:1.1;padding:5px 14px 6px}
+.day small{font-size:11px;opacity:.85}
+.lvl small{font-weight:600;opacity:.8}
+.celebrate small{display:block;font-family:var(--display);font-size:16px;color:var(--soft)}
+.py,.sent .spy,.line .spy{font-family:var(--pinyin)}
 .parentbtn{align-self:center;border:0;background:rgba(255,255,255,.6);border-radius:999px;padding:8px 16px;font-family:var(--display);font-size:14px;cursor:pointer;color:var(--ink)}
 .drawer{position:fixed;inset:auto 0 0 0;z-index:5;background:#fffdf9;border-radius:24px 24px 0 0;max-height:86%;overflow:auto;box-shadow:0 -10px 40px rgba(0,0,0,.3);
   padding:16px max(16px,env(safe-area-inset-right,0px)) calc(20px + env(safe-area-inset-bottom,0px)) max(16px,env(safe-area-inset-left,0px))}
@@ -148,9 +160,9 @@ select{font:inherit;padding:6px 8px;border-radius:10px;border:1px solid #d9cfdc;
   <div class="top">
     <div class="day" id="dayLabel">第 1 天</div>
     <div class="icons">
-      <button class="ib" id="shareBtn" aria-label="Share this lesson">🔗</button>
-      <button class="ib" id="musicBtn" aria-pressed="false" aria-label="Music">🎵</button>
-      <button class="ib" id="themeBtn" aria-label="Change theme">🎨</button>
+      <div class="ibw"><button class="ib" id="shareBtn" aria-label="Share this lesson">🔗</button><small>Share</small></div>
+      <div class="ibw"><button class="ib" id="musicBtn" aria-pressed="false" aria-label="Music">🎵</button><small>Music</small></div>
+      <div class="ibw"><button class="ib" id="themeBtn" aria-label="Change theme">🎨</button><small>Theme</small></div>
     </div>
   </div>
 
@@ -164,20 +176,20 @@ select{font:inherit;padding:6px 8px;border-radius:10px;border:1px solid #d9cfdc;
       <div id="sentBody"></div>
     </button>
     <div class="play">
-      <button class="big" id="playChar">🔊 字</button>
-      <button class="big alt" id="playSent">🔊 句子</button>
+      <button class="big" id="playChar"><span>🔊 字</span><small>Hear the character</small></button>
+      <button class="big alt" id="playSent"><span>🔊 句子</span><small>Hear the sentence</small></button>
     </div>
-    <button class="big" id="learned" style="width:100%;background:#ffc93c;color:#5a3a00">⭐ 我学会了！</button>
+    <button class="big" id="learned" style="width:100%;background:#ffc93c;color:#5a3a00"><span>⭐ 我学会了！</span><small>I learned it!</small></button>
   </main>
 
   <div class="voice" role="group" aria-label="Voice">
-    <button id="vMom" aria-pressed="true">👩 妈妈</button>
-    <button id="vBot" aria-pressed="false">🤖 机器</button>
+    <button id="vMom" aria-pressed="true"><span>👩 妈妈</span><small>Mom's voice</small></button>
+    <button id="vBot" aria-pressed="false"><span>🤖 机器</span><small>Robot voice</small></button>
   </div>
   <div class="note" id="note"></div>
 
   <section class="shelf">
-    <div class="shelf-head"><img src="img/cat-blossom.jpg" alt="Kitty with plum blossoms"><div><h2>所有的字 · All characters</h2><p>小猫陪你学中文</p></div></div>
+    <div class="shelf-head"><img src="img/cat-blossom.jpg" alt="Kitty with plum blossoms"><div><h2>所有的字 · All characters</h2><p>小猫陪你学中文 · Learn Chinese with Kitty</p></div></div>
     <div class="tiles" id="tiles"></div>
   </section>
 
@@ -185,7 +197,7 @@ select{font:inherit;padding:6px 8px;border-radius:10px;border:1px solid #d9cfdc;
   <button class="parentbtn" id="openParent">For Mom ⚙︎</button>
 </div>
 
-<div class="celebrate" id="celebrate" hidden><div class="box"><img src="img/cat-blossom.jpg" alt=""><b>你真棒！</b></div></div>
+<div class="celebrate" id="celebrate" hidden><div class="box"><img src="img/cat-blossom.jpg" alt=""><b>你真棒！</b><small>Great job!</small></div></div>
 <div class="drawer" id="drawer" hidden>
   <div class="in">
     <div class="row" style="justify-content:space-between"><h3>Mom's corner</h3><button class="sb ghost" id="closeParent">Done</button></div>
@@ -313,7 +325,7 @@ const L=[
 ["梦","mèng","dream","🌙",null,null,null,[["M","晚安，宝贝，做个好梦。","Wǎn'ān, bǎobèi, zuò ge hǎo mèng.","Good night, sweetie. Sweet dreams."],["A","晚安妈妈，我会梦到小猫。","Wǎn'ān māma, wǒ huì mèng dào xiǎo māo.","Good night, Mom. I'll dream about kitties."]]],
 ["永","yǒng","forever","💞",null,null,null,[["A","妈妈，我爱你。","Māma, wǒ ài nǐ.","Mom, I love you."],["M","妈妈也爱你，永远爱你。","Māma yě ài nǐ, yǒngyuǎn ài nǐ.","Mommy loves you too, forever and ever."]]]
 ];
-const LEVELS=[[0,"Level 1 · 入门"],[30,"Level 2 · 日常"],[50,"Level 3 · 长句子"],[70,"Level 4 · 对话 with Mom"]];
+const LEVELS=[[0,"Level 1 · 入门","Beginner"],[30,"Level 2 · 日常","Everyday words"],[50,"Level 3 · 长句子","Longer sentences"],[70,"Level 4 · 对话","Talking with Mom"]];
 const levelOf=i=>LEVELS.filter(l=>i>=l[0]).length;
 
 const SEASONS={
@@ -394,22 +406,22 @@ function render(){
   const [h,py,mean,pic,zh,spy,en,dlg]=L[cur];
   ls.set("cur",cur);
   try{history.replaceState(null,"","#"+(cur+1))}catch(e){}
-  $("dayLabel").textContent="第 "+(cur+1)+" 课 · Level "+levelOf(cur);
+  $("dayLabel").innerHTML="第 "+(cur+1)+" 课 · Level "+levelOf(cur)+"<small>Lesson "+(cur+1)+"</small>";
   $("han").textContent=h;$("py").textContent=py;$("mean").textContent=mean;$("pic").textContent=pic;
   const mark=t=>esc(t).split(h).join("<b>"+h+"</b>");
   if(dlg){
     $("sentBody").innerHTML=dlg.map(([w,z,p,e])=>'<div class="line '+(w==="A"?"a":"m")+'"><span class="who">'+(w==="A"?"Angelina":"妈妈 Mamaちゃん")+'</span><div class="zh">'+mark(z)+'</div><div class="spy">'+esc(p)+'</div><div class="en">'+esc(e)+'</div></div>').join("");
-    $("playSent").textContent="🔊 对话";
+    $("playSent").innerHTML="<span>🔊 对话</span><small>Hear the conversation</small>";
   }else{
     $("sentBody").innerHTML='<div class="zh">'+mark(zh)+'</div><div class="spy">'+esc(spy)+'</div><div class="en">'+esc(en)+'</div>';
-    $("playSent").textContent="🔊 句子";
+    $("playSent").innerHTML="<span>🔊 句子</span><small>Hear the sentence</small>";
   }
   const u=unlocked(),t=$("tiles");t.innerHTML="";
-  L.forEach((l,i)=>{const lv=LEVELS.find(x=>x[0]===i);if(lv){const hd=document.createElement("div");hd.className="lvl";hd.textContent=lv[1];t.appendChild(hd)}
+  L.forEach((l,i)=>{const lv=LEVELS.find(x=>x[0]===i);if(lv){const hd=document.createElement("div");hd.className="lvl";hd.innerHTML=esc(lv[1])+" <small>· "+esc(lv[2])+"</small>";t.appendChild(hd)}
     const b=document.createElement("button");b.className="tile"+(i===cur?" cur":"")+(done.includes(i)?" done":"");
     b.disabled=i>=u;b.textContent=i<u?l[0]:"?";b.setAttribute("aria-label",i<u?"Lesson "+(i+1)+" "+l[0]:"Locked");
     b.onclick=()=>{cur=i;render();refreshParent()};t.appendChild(b)});
-  $("learned").textContent=done.includes(cur)?"⭐ 学会啦！Learned!":"⭐ 我学会了！";
+  $("learned").innerHTML=done.includes(cur)?"<span>⭐ 学会啦！</span><small>Learned! Tap again for stars</small>":"<span>⭐ 我学会了！</span><small>I learned it!</small>";
   $("vMom").setAttribute("aria-pressed",voice==="mom");$("vBot").setAttribute("aria-pressed",voice==="bot");
   $("note").textContent="";
 }
