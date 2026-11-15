@@ -597,10 +597,12 @@ async function srcFor(key){
   }
   return rem;
 }
+/* very fast playback also raises the pitch, for a silly chipmunk voice */
+function setPitchKeep(on){try{player.preservesPitch=on;player.webkitPreservesPitch=on;player.mozPreservesPitch=on}catch(e){}}
 async function playKey(key,text,pr){
   if(voice==="mom"){
     const src=await srcFor(key);
-    if(src){try{speechSynthesis.cancel()}catch(e){}player.src=src;player.defaultPlaybackRate=player.playbackRate=pr||1;duck(true);
+    if(src){try{speechSynthesis.cancel()}catch(e){}player.src=src;player.defaultPlaybackRate=player.playbackRate=pr||1;setPitchKeep(!(pr>1.5));duck(true);
       player.onended=()=>duck(false);try{await player.play();return}catch(e){duck(false)}}
     if(hasZh!==false)$("note").textContent="Mom hasn't recorded this one yet, so the robot is reading it.";
   }
@@ -615,7 +617,7 @@ async function playMomOnly(key,i){
   player.pause();
   const src=await srcFor(key);
   if(!src||my!==tileTap||!still())return;
-  player.src=src;player.defaultPlaybackRate=player.playbackRate=1;duck(true);player.onended=()=>duck(false);
+  player.src=src;player.defaultPlaybackRate=player.playbackRate=1;setPitchKeep(true);duck(true);player.onended=()=>duck(false);
   try{await player.play()}catch(e){duck(false)}
 }
 const sayChar=()=>{$("tzg").classList.remove("pop");void $("tzg").offsetWidth;$("tzg").classList.add("pop");playKey("v-"+cur+"-c",L[cur][0])};
@@ -779,8 +781,8 @@ function xid(){return tab+String(xi[tab]+1).padStart(2,"0")+(tab==="st"?"-p"+(xp
 function keyC(){return tab==="chars"?"v-"+cur+"-c":"x-"+xid()}
 function keyS(){return "v-"+cur+"-s"}
 function xMark(i){document.querySelectorAll(".xline").forEach((el,j)=>el.classList.toggle("on",j===i))}
-function xSpeakAll(rate){return async()=>{const ls_=xlines();for(let i=0;i<ls_.length;i++){xMark(i);await speak(ls_[i][0],1,rate)}xMark(-1)}}
-function xPlay(rate,pr){playKey("x-"+xid(),xSpeakAll(rate),pr)}
+function xSpeakAll(rate,pitch){return async()=>{const ls_=xlines();for(let i=0;i<ls_.length;i++){xMark(i);await speak(ls_[i][0],pitch||1,rate)}xMark(-1)}}
+function xPlay(rate,pr,pitch){playKey("x-"+xid(),xSpeakAll(rate,pitch),pr)}
 const B=(cls,id,zh,py,en)=>'<button class="big '+cls+'" id="'+id+'"><span>'+zh+' <i class="bpy">'+py+'</i></span><small>'+en+'</small></button>';
 function renderX(){
   const T=X[tab],it=xitem(),n=xi[tab]+1;
@@ -801,12 +803,12 @@ function renderX(){
   document.querySelectorAll(".xline").forEach(el=>el.onclick=async()=>{const i=+el.dataset.i,l=xlines()[i];
     // Mom's voice picked and Mom recorded this piece: play her recording
     if(voice==="mom"){const src=await srcFor("x-"+xid());
-      if(src){try{speechSynthesis.cancel()}catch(e){}player.src=src;player.defaultPlaybackRate=player.playbackRate=1;duck(true);
+      if(src){try{speechSynthesis.cancel()}catch(e){}player.src=src;player.defaultPlaybackRate=player.playbackRate=1;setPitchKeep(true);duck(true);
         document.querySelectorAll(".xline").forEach(x=>x.classList.add("on"));
         player.onended=()=>{duck(false);xMark(-1)};try{await player.play()}catch(e){duck(false);xMark(-1)}return}}
     if(hasZh===false){toast("Mom hasn't recorded this one yet, and this browser has no built-in Chinese voice.");return}
     xMark(i);speak(l[0]).then(()=>xMark(-1))});
-  if($("xSlow")){$("xSlow").onclick=()=>xPlay(.55,.75);$("xFast").onclick=()=>xPlay(1.05,1.25)}
+  if($("xSlow")){$("xSlow").onclick=()=>xPlay(.55,.75);$("xFast").onclick=()=>xPlay(2,2.2,1.8)}
   if($("xAll"))$("xAll").onclick=()=>xPlay(.75,1);
   if($("xRead")){$("xRead").onclick=()=>xPlay(.75,1);
     $("xPrev").disabled=xpage===0;$("xNext").disabled=xpage===it.pages.length-1;
