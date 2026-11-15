@@ -130,6 +130,10 @@ button:focus-visible{outline:3px solid var(--accent2);outline-offset:2px}
 .lvl small{font-weight:600;opacity:.8}
 .celebrate small{display:block;font-family:var(--display);font-size:16px;color:var(--soft)}
 .py,.sent .spy,.line .spy{font-family:var(--pinyin)}
+.voice button.off{opacity:.55}
+.toast{position:fixed;left:50%;bottom:calc(20px + env(safe-area-inset-bottom,0px));transform:translate(-50%,30px);opacity:0;pointer-events:none;z-index:8;
+  width:min(360px,calc(100% - 32px));background:#2a1f33;color:#fff;border-radius:16px;padding:12px 16px;font-family:var(--display);font-size:15px;line-height:1.35;text-align:center;box-shadow:0 10px 30px rgba(0,0,0,.3);transition:.3s}
+.toast.show{opacity:1;transform:translate(-50%,0)}
 .parentbtn{align-self:center;border:0;background:rgba(255,255,255,.6);border-radius:999px;padding:8px 16px;font-family:var(--display);font-size:14px;cursor:pointer;color:var(--ink)}
 .drawer{position:fixed;inset:auto 0 0 0;z-index:5;background:#fffdf9;border-radius:24px 24px 0 0;max-height:86%;overflow:auto;box-shadow:0 -10px 40px rgba(0,0,0,.3);
   padding:16px max(16px,env(safe-area-inset-right,0px)) calc(20px + env(safe-area-inset-bottom,0px)) max(16px,env(safe-area-inset-left,0px))}
@@ -431,11 +435,31 @@ const player=new Audio();let music=new Audio();music.loop=false;
 music.addEventListener("ended",()=>{musicOn=false;$("musicBtn").setAttribute("aria-pressed","false")});music.volume=.3;
 let lastURL=null;
 function duck(on){music.volume=on?.08:.3}
+/* does this browser have a Chinese built-in voice?  null = still checking */
+let hasZh=null;
+const zhVoices=()=>("speechSynthesis" in window)?speechSynthesis.getVoices().filter(v=>/^(zh|cmn|yue)/i.test(v.lang||"")||/chinese|mandarin|普通话|中文|國語|粤语/i.test(v.name||"")):[];
+function checkVoices(){
+  if(!("speechSynthesis" in window)){setHasZh(false);return}
+  const tryNow=()=>{if(zhVoices().length){setHasZh(true);return true}return false};
+  if(tryNow())return;
+  speechSynthesis.addEventListener?.("voiceschanged",tryNow);
+  let n=0;const t=setInterval(()=>{n++;if(tryNow()){clearInterval(t)}else if(n>=8){clearInterval(t);if(hasZh===null)setHasZh(false)}},400);
+}
+function setHasZh(v){
+  if(hasZh===v)return;hasZh=v;
+  $("vBot").classList.toggle("off",!v);
+  $("vBot").querySelector("small").textContent=v?"Robot voice":"Not on this browser";
+  if(!v&&voice==="bot"){voice="mom";ls.set("voice",voice);render();toast("This browser has no built-in Chinese voice, so I switched to Mom's voice.")}
+}
+function toast(msg){
+  let t=$("toast");if(!t){t=document.createElement("div");t.id="toast";t.className="toast";t.setAttribute("role","status");document.body.appendChild(t)}
+  t.textContent=msg;t.classList.add("show");clearTimeout(t._h);t._h=setTimeout(()=>t.classList.remove("show"),4500);
+}
 function speak(text,pitch){
   return new Promise(r=>{
-    if(!("speechSynthesis" in window)){$("note").textContent="This browser has no built-in voice.";return r()}
+    if(!("speechSynthesis" in window)||hasZh===false){toast("Mom hasn't recorded this one yet, and this browser has no built-in Chinese voice.");return r()}
     speechSynthesis.cancel();const u=new SpeechSynthesisUtterance(text);u.lang="zh-CN";u.rate=.75;if(pitch)u.pitch=pitch;
-    const vs=speechSynthesis.getVoices().filter(v=>/^zh(-|_)?(CN|Hans)?/i.test(v.lang));
+    const vs=zhVoices().filter(v=>!/yue|HK/i.test(v.lang||""));
     const pick=vs.find(v=>/premium|enhanced/i.test(v.name))||vs.find(v=>/CN/i.test(v.lang))||vs[0];if(pick)u.voice=pick;
     u.onend=r;u.onerror=r;duck(true);speechSynthesis.speak(u);
   }).then(()=>duck(false));
@@ -476,7 +500,7 @@ async function playKey(key,text){
     const src=await srcFor(key);
     if(src){try{speechSynthesis.cancel()}catch(e){}player.src=src;duck(true);
       player.onended=()=>duck(false);try{await player.play();return}catch(e){duck(false)}}
-    $("note").textContent="Mom hasn't recorded this one yet, so the robot is reading it.";
+    if(hasZh!==false)$("note").textContent="Mom hasn't recorded this one yet, so the robot is reading it.";
   }
   return typeof text==="function"?text():speak(text);
 }
@@ -485,7 +509,9 @@ const sentText=i=>L[i][7]?async()=>{for(const [w,z] of L[i][7]){await speak(z,w=
 const saySent=()=>playKey("v-"+cur+"-s",sentText(cur));
 $("tzg").onclick=sayChar;$("playChar").onclick=sayChar;$("sent").onclick=saySent;$("playSent").onclick=saySent;
 $("vMom").onclick=()=>{voice="mom";ls.set("voice",voice);render()};
-$("vBot").onclick=()=>{voice="bot";ls.set("voice",voice);render()};
+$("vBot").onclick=()=>{
+  if(hasZh===false){voice="mom";ls.set("voice",voice);render();toast("Your browser has no built-in Chinese voice, so I switched to Mom's voice for you.");return}
+  voice="bot";ls.set("voice",voice);render()};
 
 $("learned").onclick=e=>{
   if(!done.includes(cur)){done.push(cur);ls.set("done",done)}
@@ -595,7 +621,7 @@ async function refreshParent(){
   const m=await get("m-"+season())||(await remote("m-"+season())?{name:"on website"}:null);$("stM").innerHTML=m?'<span class="ok">✓ '+(m.name||"song")+'</span>':'<span style="color:#9a8aa5">· none</span>';
   const ma=await get("m-all")||(await remote("m-all")?{name:"on website"}:null);$("stMA").innerHTML=ma?'<span class="ok">✓ '+(ma.name||"song")+'</span>':'<span style="color:#9a8aa5">· none</span>';
 }
-if("speechSynthesis" in window){speechSynthesis.getVoices();speechSynthesis.onvoiceschanged=()=>{}}
+checkVoices();
 /* two kitties take turns: hop, spin, swap */
 const CATS=["img/cat-a.png","img/cat-b.png"];CATS.forEach(u=>{const i=new Image();i.src=u});
 let catI=0;
