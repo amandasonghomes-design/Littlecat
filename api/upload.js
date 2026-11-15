@@ -6,7 +6,8 @@
 //   GITHUB_BRANCH   optional, defaults to main
 const crypto = require("crypto");
 
-const NAME_RE = /^day\d{2}-(char|sentence)\.(m4a|mp3|mp4|aac|wav|webm|ogg)$/;
+// lessons: day01-char, day01-sentence · tongue twisters: tw01 · rhymes: rh01 · stories: st01-p1
+const NAME_RE = /^(day\d{2}-(char|sentence)|(tw|rh)\d{2}|st\d{2}-p\d{1,2})\.(m4a|mp3|mp4|aac|wav|webm|ogg)$/;
 const MAX_BYTES = 3 * 1024 * 1024;
 
 function same(a, b) {

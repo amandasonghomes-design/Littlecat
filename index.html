@@ -44,7 +44,7 @@ body{margin:0;background:linear-gradient(170deg,var(--sky1),var(--sky2));backgro
 @keyframes rise{to{transform:translateY(-120vh)}}
 @media (prefers-reduced-motion:reduce){.p{animation:none;display:none}}
 
-.wrap{position:relative;z-index:1;max-width:460px;margin:0 auto;padding-block:12px 40px;display:flex;flex-direction:column;gap:14px}
+.wrap{position:relative;z-index:1;max-width:460px;margin:0 auto;padding-block:12px calc(104px + env(safe-area-inset-bottom,0px));display:flex;flex-direction:column;gap:14px}
 .top{display:flex;align-items:center;justify-content:space-between;gap:8px}
 .day{font-family:var(--display);font-weight:800;font-size:20px;color:#fff;background:rgba(0,0,0,.25);padding:4px 14px;border-radius:999px;letter-spacing:.02em}
 [data-season="spring"] .day,[data-season="summer"] .day,[data-season="winter"] .day{background:rgba(255,255,255,.7);color:var(--ink)}
@@ -131,7 +131,7 @@ button:focus-visible{outline:3px solid var(--accent2);outline-offset:2px}
 .celebrate small{display:block;font-family:var(--display);font-size:16px;color:var(--soft)}
 .py,.sent .spy,.line .spy{font-family:var(--pinyin)}
 .voice button.off{opacity:.55}
-.toast{position:fixed;left:50%;bottom:calc(20px + env(safe-area-inset-bottom,0px));transform:translate(-50%,30px);opacity:0;pointer-events:none;z-index:8;
+.toast{position:fixed;left:50%;bottom:calc(100px + env(safe-area-inset-bottom,0px));transform:translate(-50%,30px);opacity:0;pointer-events:none;z-index:8;
   width:min(360px,calc(100% - 32px));background:#2a1f33;color:#fff;border-radius:16px;padding:12px 16px;font-family:var(--display);font-size:15px;line-height:1.35;text-align:center;box-shadow:0 10px 30px rgba(0,0,0,.3);transition:.3s}
 .toast.show{opacity:1;transform:translate(-50%,0)}
 .bpy{white-space:nowrap;font-style:normal;font-family:var(--pinyin);font-weight:600;font-size:.7em;opacity:.9;margin-left:2px}
@@ -164,6 +164,38 @@ button:focus-visible{outline:3px solid var(--accent2);outline-offset:2px}
 .zao .row2{display:flex;gap:10px;width:100%}
 .zao .row2 .big{font-size:16px;padding:10px}
 @media (prefers-reduced-motion:reduce){.mic.on{animation:none}.zao .sheet{animation:none}}
+/* bottom tab bar */
+.tabbar{position:fixed;left:0;right:0;bottom:0;z-index:4;display:grid;grid-template-columns:repeat(4,1fr);gap:4px;background:rgba(255,253,249,.97);
+  box-shadow:0 -6px 20px rgba(0,0,0,.15);border-radius:20px 20px 0 0;
+  padding:6px max(8px,env(safe-area-inset-right,0px),calc((100% - 470px)/2)) calc(6px + env(safe-area-inset-bottom,0px)) max(8px,env(safe-area-inset-left,0px),calc((100% - 470px)/2))}
+.tabbar button{border:0;background:none;border-radius:14px;padding:5px 2px;display:flex;flex-direction:column;align-items:center;gap:0;cursor:pointer;color:#7a6a85;font-family:var(--display);min-width:0}
+.tabbar b{font-size:21px;line-height:1.1}
+.tabbar span{font-family:var(--body);font-weight:700;font-size:14px;color:#2a1f33;line-height:1.2}
+.tabbar i{font-style:normal;font-family:var(--pinyin);font-weight:500;font-size:10px;line-height:1.2}
+.tabbar small{font-size:10.5px;font-weight:700;line-height:1.2}
+.tabbar button[aria-selected="true"]{background:color-mix(in srgb,var(--accent) 16%,#fff)}
+.tabbar button[aria-selected="true"] small{color:var(--accent)}
+/* extra sections */
+.xpic{font-size:60px;line-height:1.1;margin-top:4px;letter-spacing:4px}
+.xkind{font-family:var(--display);font-weight:700;font-size:14px;color:var(--soft)}
+.xtitle{margin:-6px 0 0;font-family:var(--han);font-size:34px;line-height:1.2;color:var(--ink);text-wrap:balance}
+.xte{font-family:var(--display);font-size:15px;color:var(--soft);margin-top:-10px;text-wrap:balance}
+.xpage{font-family:var(--display);font-size:13px;font-weight:700;color:var(--accent)}
+.xlines{width:100%;display:flex;flex-direction:column;gap:8px}
+.xline{border:0;background:color-mix(in srgb,var(--accent2) 14%,#fff);border-radius:16px;padding:10px 12px;cursor:pointer;text-align:center;font:inherit;color:inherit;transition:background .2s}
+.xline .zh{font-size:23px;font-weight:700;letter-spacing:.04em;line-height:1.35}
+.xline .spy{font-family:var(--pinyin);font-size:15px;color:var(--soft)}
+.xline .en{font-family:var(--display);font-size:14px;color:var(--soft);opacity:.85}
+.xline.on{background:color-mix(in srgb,var(--accent) 22%,#fff)}
+.xhint{font-family:var(--display);font-size:13px;color:var(--soft);margin-top:-4px}
+.xtiles{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
+.xtile{border:2px solid var(--grid);border-radius:14px;background:#fff;padding:8px 10px;display:flex;align-items:center;gap:8px;cursor:pointer;text-align:left;font:inherit;color:var(--ink);min-width:0}
+.xtile b{font-size:26px;flex:none;font-weight:400}
+.xtile span{min-width:0;font-family:var(--body);font-weight:700;font-size:15px;line-height:1.25}
+.xtile small{display:block;font-family:var(--display);font-weight:600;font-size:12px;color:var(--soft);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.xtile.cur{border-color:var(--accent);background:color-mix(in srgb,var(--accent) 14%,#fff)}
+.big.sm{padding:10px 4px;font-size:16px}
+.zao .target b.long{font-size:28px;max-width:12em}
 .parentbtn{align-self:center;border:0;background:rgba(255,255,255,.6);border-radius:999px;padding:8px 16px;font-family:var(--display);font-size:14px;cursor:pointer;color:var(--ink)}
 .drawer{position:fixed;inset:auto 0 0 0;z-index:5;background:#fffdf9;border-radius:24px 24px 0 0;max-height:86%;overflow:auto;box-shadow:0 -10px 40px rgba(0,0,0,.3);
   padding:16px max(16px,env(safe-area-inset-right,0px)) calc(20px + env(safe-area-inset-bottom,0px)) max(16px,env(safe-area-inset-left,0px))}
@@ -180,7 +212,7 @@ button:focus-visible{outline:3px solid var(--accent2);outline-offset:2px}
 select{font:inherit;padding:6px 8px;border-radius:10px;border:1px solid #d9cfdc;background:#fff}
 .burst{position:fixed;z-index:4;pointer-events:none;font-size:30px;animation:burst 1s ease-out forwards}
 @keyframes burst{to{transform:translate(var(--dx),var(--dy)) scale(.6);opacity:0}}
-.baby{position:fixed;z-index:3;left:max(6px,env(safe-area-inset-left,0px));bottom:calc(6px + env(safe-area-inset-bottom,0px));width:44px;height:44px;border:0;background:transparent;font-size:26px;opacity:.35;cursor:pointer;padding:0;transition:opacity .2s}
+.baby{position:fixed;z-index:3;left:max(6px,env(safe-area-inset-left,0px));bottom:calc(96px + env(safe-area-inset-bottom,0px));width:44px;height:44px;border:0;background:transparent;font-size:26px;opacity:.35;cursor:pointer;padding:0;transition:opacity .2s}
 .baby:hover,.baby:focus-visible{opacity:.9}
 .baby.go{animation:wig .6s;opacity:1}
 @keyframes wig{25%{transform:rotate(-15deg) scale(1.3)}75%{transform:rotate(15deg) scale(1.3)}}
@@ -220,27 +252,40 @@ select{font:inherit;padding:6px 8px;border-radius:10px;border:1px solid #d9cfdc;
     </div>
   </main>
 
+  <section class="card" id="xcard" hidden><div id="xbody" style="display:contents"></div></section>
+
   <div class="voice" role="group" aria-label="Voice">
     <button id="vMom" aria-pressed="true"><span>👩 妈妈 <i class="bpy">māma</i></span><small>Mom's voice</small></button>
     <button id="vBot" aria-pressed="false"><span>🤖 机器 <i class="bpy">jīqì</i></span><small>Robot voice</small></button>
   </div>
   <div class="note" id="note"></div>
 
-  <section class="shelf">
+  <section class="shelf" id="cshelf">
     <div class="shelf-head"><img src="img/cat-blossom.jpg" alt="Kitty with plum blossoms"><div><h2>所有的字 · All characters</h2><p>小猫陪你学中文 · Learn Chinese with Kitty</p></div></div>
     <div class="tiles" id="tiles"></div>
+  </section>
+
+  <section class="shelf" id="xshelf" hidden>
+    <div class="shelf-head"><img src="img/cat-blossom.jpg" alt=""><div><h2 id="xshelfTitle"></h2><p id="xshelfSub"></p></div></div>
+    <div class="xtiles" id="xtiles"></div>
   </section>
 
   <button class="secret" id="secretBaby" aria-label="A little surprise">👶</button>
   <button class="parentbtn" id="openParent">For Mom ⚙︎</button>
 </div>
 
+<nav class="tabbar" role="tablist" aria-label="Sections">
+  <button role="tab" data-tab="chars" aria-selected="true"><b>📖</b><span>学字</span><i>xué zì</i><small>Characters</small></button>
+  <button role="tab" data-tab="tw" aria-selected="false"><b>👅</b><span>绕口令</span><i>ràokǒulìng</i><small>Tongue twisters</small></button>
+  <button role="tab" data-tab="rh" aria-selected="false"><b>🎵</b><span>儿歌</span><i>érgē</i><small>Rhymes</small></button>
+  <button role="tab" data-tab="st" aria-selected="false"><b>📚</b><span>故事</span><i>gùshi</i><small>Stories</small></button>
+</nav>
 <div class="zao" id="zao" hidden role="dialog" aria-modal="true" aria-labelledby="zaoTitle">
   <div class="sheet">
     <button class="x" id="zaoClose" aria-label="Close">✕</button>
     <h3 id="zaoTitle">🎤 造句<i>zàojù</i></h3>
     <div class="target"><b id="zaoHan">水</b><span id="zaoPy">shuǐ<small id="zaoMean">water</small></span></div>
-    <p class="tip">Tap the microphone and say a fun sentence in Chinese using <em id="zaoHan2">水</em>. Tap again when you're done.</p>
+    <p class="tip" id="zaoTip">Tap the microphone and say a fun sentence in Chinese using <em>水</em>. Tap again when you're done.</p>
     <button class="mic" id="zaoMic" aria-label="Start recording">🎤</button>
     <div class="status" id="zaoStatus">Tap to start</div>
     <div class="result" id="zaoResult" hidden>
@@ -250,7 +295,7 @@ select{font:inherit;padding:6px 8px;border-radius:10px;border:1px solid #d9cfdc;
       <div class="hint" id="zaoHint" hidden></div>
     </div>
     <div class="row2" id="zaoPlayRow" hidden>
-      <button class="big" id="zaoMine"><span>▶︎ 我的造句 <i class="bpy">wǒ de zàojù</i></span><small>Hear my sentence</small></button>
+      <button class="big" id="zaoMine"></button>
       <button class="big alt" id="zaoRead"><span>🔊 读 <i class="bpy">dú</i></span><small>Hear it read aloud</small></button>
     </div>
   </div>
@@ -262,8 +307,8 @@ select{font:inherit;padding:6px 8px;border-radius:10px;border:1px solid #d9cfdc;
 
     <div>
       <h4>Your voice for <span id="pDay">Lesson 1</span>: <span id="pHan" style="font-family:var(--han)">猫</span></h4>
-      <div class="slot"><span>Character <span id="stC"></span></span><span class="row"><button class="sb rec" id="recC">🎙 Record</button><button class="sb ghost" id="tryC">Play</button><button class="sb ghost" id="saveC">Save file</button></span></div>
-      <div class="slot" style="margin-top:6px"><span>Sentence or dialogue <span id="stS"></span></span><span class="row"><button class="sb rec" id="recS">🎙 Record</button><button class="sb ghost" id="trySentP">Play</button><button class="sb ghost" id="saveS">Save file</button></span></div>
+      <div class="slot"><span><span id="slotCLabel">Character</span> <span id="stC"></span></span><span class="row"><button class="sb rec" id="recC">🎙 Record</button><button class="sb ghost" id="tryC">Play</button><button class="sb ghost" id="saveC">Save file</button></span></div>
+      <div class="slot" id="slotS" style="margin-top:6px"><span>Sentence or dialogue <span id="stS"></span></span><span class="row"><button class="sb rec" id="recS">🎙 Record</button><button class="sb ghost" id="trySentP">Play</button><button class="sb ghost" id="saveS">Save file</button></span></div>
       <p class="help" style="margin-top:6px">When you tap Stop, the recording saves to the server by itself, so it plays on every phone and computer within about a minute. <b>Save file</b> keeps a copy for you, named like <code id="fnHint">day01-char.m4a</code>.</p>
       <div class="row" style="margin-top:6px"><button class="sb ghost" id="upC">Use a file for character</button><button class="sb ghost" id="upS">Use a file for sentence</button></div>
     </div>
@@ -425,9 +470,11 @@ let start=ls.get("start",null); if(start==null){start=today0();ls.set("start",st
 let bonus=ls.get("bonus",0);
 function unlocked(){return L.length}
 let cur=Math.min(L.length-1,Math.max(0,ls.get("cur",0)));
+const HASH0=location.hash;
+let tab="chars";
 const hashNum=()=>{const m=(location.hash||"").match(/^#(\d+)$/);return m?+m[1]-1:-1};
 if(hashNum()>=0&&hashNum()<L.length)cur=hashNum();
-window.addEventListener("hashchange",()=>{const n=hashNum();if(n>=0&&n<L.length&&n!==cur){cur=n;render();refreshParent()}});
+window.addEventListener("hashchange",()=>route(location.hash));
 let voice=ls.get("voice","mom");
 let themeChoice=ls.get("theme","auto");
 let done=ls.get("done",[]);
@@ -463,8 +510,8 @@ function applyTheme(){
 function render(){
   const [h,py,mean,pic,zh,spy,en,dlg]=L[cur];
   ls.set("cur",cur);
-  try{history.replaceState(null,"","#"+(cur+1))}catch(e){}
-  $("dayLabel").innerHTML="第 "+(cur+1)+" 课 · Level "+levelOf(cur)+"<small>Lesson "+(cur+1)+"</small>";
+  if(tab==="chars"){try{history.replaceState(null,"","#"+(cur+1))}catch(e){}
+  $("dayLabel").innerHTML="第 "+(cur+1)+" 课 · Level "+levelOf(cur)+"<small>Lesson "+(cur+1)+"</small>";}
   $("han").textContent=h;$("py").textContent=py;$("mean").textContent=mean;$("pic").textContent=pic;
   const mark=t=>esc(t).split(h).join("<b>"+h+"</b>");
   if(dlg){
@@ -509,10 +556,10 @@ function toast(msg){
   let t=$("toast");if(!t){t=document.createElement("div");t.id="toast";t.className="toast";t.setAttribute("role","status");document.body.appendChild(t)}
   t.textContent=msg;t.classList.add("show");clearTimeout(t._h);t._h=setTimeout(()=>t.classList.remove("show"),4500);
 }
-function speak(text,pitch){
+function speak(text,pitch,rate){
   return new Promise(r=>{
     if(!("speechSynthesis" in window)||hasZh===false){toast("Mom hasn't recorded this one yet, and this browser has no built-in Chinese voice.");return r()}
-    speechSynthesis.cancel();const u=new SpeechSynthesisUtterance(text);u.lang="zh-CN";u.rate=.75;if(pitch)u.pitch=pitch;
+    speechSynthesis.cancel();const u=new SpeechSynthesisUtterance(text);u.lang="zh-CN";u.rate=rate||.75;if(pitch)u.pitch=pitch;
     const vs=zhVoices().filter(v=>!/yue|HK/i.test(v.lang||""));
     const pick=vs.find(v=>/premium|enhanced/i.test(v.name))||vs.find(v=>/CN/i.test(v.lang))||vs[0];if(pick)u.voice=pick;
     u.onend=r;u.onerror=r;duck(true);speechSynthesis.speak(u);
@@ -521,6 +568,7 @@ function speak(text,pitch){
 /* files on the website: voice/day01-char.m4a, voice/day01-sentence.m4a, music/halloween.mp3, music/all.mp3 */
 const EXTS=["m4a","mp3","mp4","aac","wav","webm","ogg"];
 function baseName(key){
+  if(key.startsWith("x-"))return "voice/"+key.slice(2);
   if(key.startsWith("m-"))return "music/"+key.slice(2);
   const [,d,t]=key.split("-");return "voice/day"+String(+d+1).padStart(2,"0")+"-"+(t==="c"?"char":"sentence");
 }
@@ -549,10 +597,10 @@ async function srcFor(key){
   }
   return rem;
 }
-async function playKey(key,text){
+async function playKey(key,text,pr){
   if(voice==="mom"){
     const src=await srcFor(key);
-    if(src){try{speechSynthesis.cancel()}catch(e){}player.src=src;duck(true);
+    if(src){try{speechSynthesis.cancel()}catch(e){}player.src=src;player.defaultPlaybackRate=player.playbackRate=pr||1;duck(true);
       player.onended=()=>duck(false);try{await player.play();return}catch(e){duck(false)}}
     if(hasZh!==false)$("note").textContent="Mom hasn't recorded this one yet, so the robot is reading it.";
   }
@@ -561,12 +609,13 @@ async function playKey(key,text){
 /* tapping a tile plays Mom's recording of the character, only if she recorded it; never the robot */
 let tileTap=0;
 async function playMomOnly(key,i){
+  const still=typeof i==="function"?i:()=>cur===i&&tab==="chars";
   const my=++tileTap;
   try{speechSynthesis.cancel()}catch(e){}
   player.pause();
   const src=await srcFor(key);
-  if(!src||my!==tileTap||cur!==i)return;
-  player.src=src;duck(true);player.onended=()=>duck(false);
+  if(!src||my!==tileTap||!still())return;
+  player.src=src;player.defaultPlaybackRate=player.playbackRate=1;duck(true);player.onended=()=>duck(false);
   try{await player.play()}catch(e){duck(false)}
 }
 const sayChar=()=>{$("tzg").classList.remove("pop");void $("tzg").offsetWidth;$("tzg").classList.add("pop");playKey("v-"+cur+"-c",L[cur][0])};
@@ -601,8 +650,8 @@ async function startMusic(){
   try{await music.play()}catch(e){musicOn=false;$("musicBtn").setAttribute("aria-pressed","false")}
 }
 $("shareBtn").onclick=async()=>{
-  const url=location.origin+location.pathname+"#"+(cur+1);
-  const title="第 "+(cur+1)+" 课 "+L[cur][0]+" · Little Cat Chinese";
+  const url=location.origin+location.pathname+(tab==="chars"?"#"+(cur+1):"#"+tab+"-"+(xi[tab]+1));
+  const title=(tab==="chars"?"第 "+(cur+1)+" 课 "+L[cur][0]:X[tab].name+" "+xitem().t)+" · Little Cat Chinese";
   try{if(navigator.share){await navigator.share({title,url});return}}catch(e){if(e&&e.name==="AbortError")return}
   try{await navigator.clipboard.writeText(url);$("note").textContent="Link copied: "+url}catch(e){$("note").textContent="Link: "+url}
 };
@@ -627,7 +676,7 @@ $("srvPw").value=pw();
 $("srvSave").onclick=()=>{ls.set("srvPw",$("srvPw").value.trim());$("srvInfo").textContent=pw()?"Saved. New recordings will upload by themselves.":"Password cleared. Recordings will stay on this phone.";};
 function b64(blob){return new Promise((r,j)=>{const f=new FileReader();f.onload=()=>r(String(f.result).split(",")[1]);f.onerror=j;f.readAsDataURL(blob)})}
 async function autoUpload(key,blob){
-  if(!key.startsWith("v-"))return;
+  if(!/^(v|x)-/.test(key))return;
   if(!pw()){upState[key]="nopw";refreshParent();return}
   const name=baseName(key).split("/")[1]+"."+extFor(blob.type);
   upState[key]="up";refreshParent();
@@ -641,11 +690,11 @@ async function autoUpload(key,blob){
 $("file").onchange=async e=>{const f=e.target.files[0];if(!f||!pending)return;const ok=await put(pending,f);if(ok){ls.set("recAt-"+pending,Date.now());autoUpload(pending,f)}
   if(!ok)alertNote("Couldn't save on this device. Private browsing can block saving.");refreshParent();pending=null};
 function alertNote(t){$("note").textContent=t}
-$("upC").onclick=()=>pick("v-"+cur+"-c");$("upS").onclick=()=>pick("v-"+cur+"-s");
+$("upC").onclick=()=>pick(keyC());$("upS").onclick=()=>pick(keyS());
 $("upM").onclick=()=>pick("m-"+season());$("upMA").onclick=()=>pick("m-all");
 $("clrM").onclick=async()=>{await put("m-"+season(),null);refreshParent()};
-$("tryC").onclick=async()=>{const v=voice;voice="mom";await playKey("v-"+cur+"-c",L[cur][0]);voice=v};
-$("trySentP").onclick=async()=>{const v=voice;voice="mom";await playKey("v-"+cur+"-s",sentText(cur));voice=v};
+$("tryC").onclick=async()=>{const v=voice;voice="mom";await playKey(keyC(),tab==="chars"?L[cur][0]:xSpeakAll());voice=v};
+$("trySentP").onclick=async()=>{const v=voice;voice="mom";await playKey(keyS(),sentText(cur));voice=v};
 
 /* recording with the microphone */
 let rec=null,recKey=null,chunks=[];
@@ -662,8 +711,8 @@ async function toggleRec(key,btn){
     player.src=URL.createObjectURL(blob);player.play().catch(()=>{});};
   rec.start();btn.classList.add("on");btn.textContent="■ Stop";
 }
-$("recC").onclick=e=>toggleRec("v-"+cur+"-c",e.currentTarget);
-$("recS").onclick=e=>toggleRec("v-"+cur+"-s",e.currentTarget);
+$("recC").onclick=e=>toggleRec(keyC(),e.currentTarget);
+$("recS").onclick=e=>toggleRec(keyS(),e.currentTarget);
 async function saveFile(key){
   const b=await get(key);if(!b){alertNote("Record this one first, then save it.");return}
   const name=baseName(key).split("/")[1]+"."+extFor(b.type);
@@ -671,10 +720,14 @@ async function saveFile(key){
   try{if(navigator.canShare&&navigator.canShare({files:[file]})){await navigator.share({files:[file],title:name});return}}catch(e){if(e&&e.name==="AbortError")return}
   const a=document.createElement("a");a.href=URL.createObjectURL(file);a.download=name;document.body.appendChild(a);a.click();a.remove();
 }
-$("saveC").onclick=()=>saveFile("v-"+cur+"-c");$("saveS").onclick=()=>saveFile("v-"+cur+"-s");
+$("saveC").onclick=()=>saveFile(keyC());$("saveS").onclick=()=>saveFile(keyS());
 async function refreshParent(){
-  $("pDay").textContent="Lesson "+(cur+1);$("pHan").textContent=L[cur][0];
-  $("fnHint").textContent=baseName("v-"+cur+"-c").split("/")[1]+".m4a";
+  const isC=tab==="chars";
+  $("pDay").textContent=isC?"Lesson "+(cur+1):X[tab].en+" "+(xi[tab]+1)+(tab==="st"?", page "+(xpage+1):"");
+  $("pHan").textContent=isC?L[cur][0]:xitem().t;
+  $("slotCLabel").textContent=isC?"Character":tab==="st"?"This page":"Whole "+X[tab].en.toLowerCase();
+  $("slotS").hidden=!isC;$("upS").hidden=!isC;$("upC").textContent=isC?"Use a file for character":"Use a file";
+  $("fnHint").textContent=baseName(keyC()).split("/")[1]+".m4a";
   const mark=async(id,k)=>{const st=upState[k];
     if(st==="up"){$(id).innerHTML='<span style="color:#9a8aa5">⏳ saving to server…</span>';return}
     if(st==="ok"){$(id).innerHTML='<span class="ok">✓ saved to server</span>';return}
@@ -682,7 +735,7 @@ async function refreshParent(){
     if(st&&st.startsWith("err:")){$(id).innerHTML='<span style="color:#c4512a">· '+esc(st.slice(4))+'</span>';return}
     const loc=await get(k),rem=await remote(k);
     $(id).innerHTML=rem?'<span class="ok">✓ on website</span>'+(loc?' <span class="ok">+ new on this phone</span>':''):loc?'<span class="ok">✓ on this phone</span>':'<span style="color:#9a8aa5">· not yet</span>'};
-  mark("stC","v-"+cur+"-c");mark("stS","v-"+cur+"-s");
+  mark("stC",keyC());if(isC)mark("stS",keyS());
   const m=await get("m-"+season())||(await remote("m-"+season())?{name:"on website"}:null);$("stM").innerHTML=m?'<span class="ok">✓ '+(m.name||"song")+'</span>':'<span style="color:#9a8aa5">· none</span>';
   const ma=await get("m-all")||(await remote("m-all")?{name:"on website"}:null);$("stMA").innerHTML=ma?'<span class="ok">✓ '+(ma.name||"song")+'</span>':'<span style="color:#9a8aa5">· none</span>';
 }
@@ -717,23 +770,110 @@ $("secretBaby").onclick=e=>{
     h.style.left=(r.left+r.width/2-12)+"px";h.style.top=(r.top)+"px";h.style.setProperty("--dx",(Math.random()*160-80)+"px");
     h.style.animationDelay=(i*0.08)+"s";document.body.appendChild(h);setTimeout(()=>h.remove(),2000)}
 };
+/* ===== tabs: 绕口令 tongue twisters, 儿歌 rhymes, 故事 stories ===== */
+const X={"tw": {"name": "绕口令", "py": "ràokǒulìng", "en": "Tongue twister", "ens": "tongue twisters", "items": [{"t": "妈妈骑马", "te": "Mom Rides a Horse", "pic": "🐴", "lines": [["妈妈骑马，马慢，妈妈骂马。", "Māma qí mǎ, mǎ màn, māma mà mǎ.", "Mom rides a horse. The horse is slow, so Mom scolds the horse."]]}, {"t": "四是四", "te": "Four Is Four", "pic": "🔢", "lines": [["四是四，十是十，", "Sì shì sì, shí shì shí,", "Four is four, ten is ten,"], ["十四是十四，四十是四十。", "shísì shì shísì, sìshí shì sìshí.", "fourteen is fourteen, forty is forty."]]}, {"t": "红鲤鱼与绿鲤鱼与驴", "te": "Red Carp, Green Carp, and a Donkey", "pic": "🐟", "lines": [["红鲤鱼与绿鲤鱼与驴。", "Hóng lǐyú yǔ lǜ lǐyú yǔ lǘ.", "A red carp, a green carp, and a donkey."]]}, {"t": "吃葡萄", "te": "Eating Grapes", "pic": "🍇", "lines": [["吃葡萄不吐葡萄皮，", "Chī pútao bù tǔ pútao pí,", "Eat the grapes but don't spit out the skins,"], ["不吃葡萄倒吐葡萄皮。", "bù chī pútao dào tǔ pútao pí.", "don't eat the grapes but spit out the skins."]]}, {"t": "石狮子", "te": "Stone Lions", "pic": "🦁", "lines": [["山前有四十四棵死涩柿子树，", "Shān qián yǒu sìshísì kē sǐ sè shìzi shù,", "In front of the hill are forty-four dried-up, sour persimmon trees,"], ["山后有四十四只石狮子。", "shān hòu yǒu sìshísì zhī shí shīzi.", "behind the hill are forty-four stone lions."], ["石狮子是死的，涩柿子是涩的。", "Shí shīzi shì sǐ de, sè shìzi shì sè de.", "The stone lions don't move, and the sour persimmons are sour."]]}, {"t": "八百标兵", "te": "Eight Hundred Soldiers", "pic": "💂", "lines": [["八百标兵奔北坡，", "Bābǎi biāobīng bēn běi pō,", "Eight hundred soldiers run up the north slope,"], ["炮兵并排北边跑。", "pàobīng bìngpái běibiān pǎo.", "the cannon soldiers run side by side to the north."], ["炮兵怕把标兵碰，", "Pàobīng pà bǎ biāobīng pèng,", "The cannon soldiers are afraid of bumping the soldiers,"], ["标兵怕碰炮兵炮。", "biāobīng pà pèng pàobīng pào.", "the soldiers are afraid of bumping the cannons."]]}]}, "rh": {"name": "儿歌", "py": "érgē", "en": "Rhyme", "ens": "rhymes", "items": [{"t": "小老鼠上灯台", "te": "Little Mouse on the Lamp", "sub": "Folk rhyme", "pic": "🐭", "lines": [["小老鼠，上灯台，", "Xiǎo lǎoshǔ, shàng dēngtái,", "A little mouse climbs up the lamp,"], ["偷油吃，下不来。", "tōu yóu chī, xià bu lái.", "steals some oil, and can't get down."], ["喵喵喵，猫来了，", "Miāo miāo miāo, māo lái le,", "Meow, meow, meow, here comes the cat,"], ["叽里咕噜滚下来。", "jīli gūlū gǔn xiàlai.", "and tumble, tumble, down it rolls!"]]}, {"t": "拍手歌", "te": "Clapping Song", "sub": "Folk rhyme", "pic": "👏", "lines": [["你拍一，我拍一，一个小孩坐飞机。", "Nǐ pāi yī, wǒ pāi yī, yí ge xiǎohái zuò fēijī.", "You clap one, I clap one, one kid rides a plane."], ["你拍二，我拍二，两个小孩丢手绢。", "Nǐ pāi èr, wǒ pāi èr, liǎng ge xiǎohái diū shǒujuàn.", "You clap two, I clap two, two kids play drop the hanky."], ["你拍三，我拍三，三个小孩来爬山。", "Nǐ pāi sān, wǒ pāi sān, sān ge xiǎohái lái pá shān.", "You clap three, I clap three, three kids climb a hill."], ["你拍四，我拍四，四个小孩写大字。", "Nǐ pāi sì, wǒ pāi sì, sì ge xiǎohái xiě dà zì.", "You clap four, I clap four, four kids write big characters."], ["你拍五，我拍五，五个小孩敲大鼓。", "Nǐ pāi wǔ, wǒ pāi wǔ, wǔ ge xiǎohái qiāo dà gǔ.", "You clap five, I clap five, five kids bang a big drum."]]}, {"t": "一二三四五", "te": "One, Two, Three, Four, Five", "sub": "Folk rhyme", "pic": "🐿️", "lines": [["一二三四五，上山打老虎。", "Yī èr sān sì wǔ, shàng shān dǎ lǎohǔ.", "One, two, three, four, five, up the hill to catch a tiger."], ["老虎没打到，打到小松鼠。", "Lǎohǔ méi dǎ dào, dǎ dào xiǎo sōngshǔ.", "No tiger was caught, just a little squirrel."], ["松鼠有几只？让我数一数。", "Sōngshǔ yǒu jǐ zhī? Ràng wǒ shǔ yi shǔ.", "How many squirrels? Let me count."], ["数来又数去，一二三四五。", "Shǔ lái yòu shǔ qù, yī èr sān sì wǔ.", "Count them again: one, two, three, four, five."]]}, {"t": "咏鹅", "te": "Ode to the Goose", "sub": "Tang poem · 骆宾王 Luo Binwang", "pic": "🦢", "lines": [["鹅，鹅，鹅，", "É, é, é,", "Goose, goose, goose,"], ["曲项向天歌。", "qū xiàng xiàng tiān gē.", "bending its neck, it sings to the sky."], ["白毛浮绿水，", "Bái máo fú lǜ shuǐ,", "White feathers float on green water,"], ["红掌拨清波。", "hóng zhǎng bō qīng bō.", "red feet paddle the clear waves."]]}, {"t": "静夜思", "te": "Quiet Night Thoughts", "sub": "Tang poem · 李白 Li Bai", "pic": "🌙", "lines": [["床前明月光，", "Chuáng qián míng yuè guāng,", "Bright moonlight shines before my bed,"], ["疑是地上霜。", "yí shì dì shàng shuāng.", "it looks like frost on the ground."], ["举头望明月，", "Jǔ tóu wàng míng yuè,", "I lift my head and look at the bright moon,"], ["低头思故乡。", "dī tóu sī gùxiāng.", "I lower my head and think of home."]]}, {"t": "春晓", "te": "Spring Morning", "sub": "Tang poem · 孟浩然 Meng Haoran", "pic": "🐦", "lines": [["春眠不觉晓，", "Chūn mián bù jué xiǎo,", "Sleeping in spring, I miss the dawn,"], ["处处闻啼鸟。", "chùchù wén tí niǎo.", "everywhere I hear birds singing."], ["夜来风雨声，", "Yè lái fēng yǔ shēng,", "Last night came the sound of wind and rain,"], ["花落知多少。", "huā luò zhī duōshǎo.", "I wonder how many flowers fell."]]}]}, "st": {"name": "故事", "py": "gùshi", "en": "Story", "ens": "stories", "items": [{"t": "小猫捞月亮", "te": "Kitty and the Moon", "pic": "🌙", "pages": [{"pic": "🐱🌕", "lines": [["晚上，小猫看见水里有一个月亮。", "Wǎnshang, xiǎo māo kànjiàn shuǐ lǐ yǒu yí ge yuèliang.", "One evening, Kitty sees a moon in the water."]]}, {"pic": "😺💭", "lines": [["小猫想：“我要把月亮拿回家！”", "Xiǎo māo xiǎng: “Wǒ yào bǎ yuèliang ná huí jiā!”", "Kitty thinks, \"I'll take the moon home!\""]]}, {"pic": "🐾💦", "lines": [["小猫用爪子一捞，月亮不见了！", "Xiǎo māo yòng zhuǎzi yì lāo, yuèliang bú jiàn le!", "Kitty scoops with her paw, and the moon is gone!"]]}, {"pic": "🌕😸", "lines": [["妈妈笑着说：“月亮在天上呢。”", "Māma xiào zhe shuō: “Yuèliang zài tiān shàng ne.”", "Mom smiles and says, \"The moon is up in the sky.\""], ["小猫抬头一看，哈哈笑了。", "Xiǎo māo tái tóu yí kàn, hāhā xiào le.", "Kitty looks up and laughs."]]}]}, {"t": "小兔的大萝卜", "te": "Bunny's Big Carrot", "pic": "🥕", "pages": [{"pic": "🐰🌱", "lines": [["春天，小兔种了一个萝卜。", "Chūntiān, xiǎo tù zhòng le yí ge luóbo.", "In spring, Bunny plants a carrot."]]}, {"pic": "💧☀️", "lines": [["小兔每天给它浇水。萝卜长呀长。", "Xiǎo tù měitiān gěi tā jiāo shuǐ. Luóbo zhǎng ya zhǎng.", "Bunny waters it every day. The carrot grows and grows."]]}, {"pic": "🥕😮", "lines": [["萝卜长得好大！小兔拔不动。", "Luóbo zhǎng de hǎo dà! Xiǎo tù bá bu dòng.", "The carrot gets so big! Bunny can't pull it out."]]}, {"pic": "🐻🐶🐰", "lines": [["小熊和小狗来帮忙。一，二，三，拔出来了！", "Xiǎo xióng hé xiǎo gǒu lái bāngmáng. Yī, èr, sān, bá chūlai le!", "Little Bear and Puppy come to help. One, two, three, out it comes!"], ["大家一起吃萝卜。", "Dàjiā yìqǐ chī luóbo.", "Everyone eats the carrot together."]]}]}, {"t": "雪人朋友", "te": "My Snowman Friend", "pic": "⛄", "pages": [{"pic": "❄️👧", "lines": [["下雪了！Angelina 跑到外面。", "Xià xuě le! Angelina pǎo dào wàimiàn.", "It's snowing! Angelina runs outside."]]}, {"pic": "👩👧⛄", "lines": [["她和妈妈一起堆了一个大雪人。", "Tā hé māma yìqǐ duī le yí ge dà xuěrén.", "She and Mom build a big snowman together."]]}, {"pic": "🧣⛄", "lines": [["Angelina 把红围巾给雪人戴上：“你冷不冷？”", "Angelina bǎ hóng wéijīn gěi xuěrén dài shang: “Nǐ lěng bu lěng?”", "Angelina puts her red scarf on the snowman. \"Are you cold?\""]]}, {"pic": "☀️⛄", "lines": [["太阳出来了。雪人笑着说：“明年冬天见！”", "Tàiyáng chūlai le. Xuěrén xiào zhe shuō: “Míngnián dōngtiān jiàn!”", "The sun comes out. The snowman smiles: \"See you next winter!\""]]}]}]}};
+const xi={tw:0,rh:0,st:0};let xpage=0;
+function xitem(){return X[tab].items[xi[tab]]}
+function xlines(){const it=xitem();return tab==="st"?it.pages[xpage].lines:it.lines}
+function xid(){return tab+String(xi[tab]+1).padStart(2,"0")+(tab==="st"?"-p"+(xpage+1):"")}
+function keyC(){return tab==="chars"?"v-"+cur+"-c":"x-"+xid()}
+function keyS(){return "v-"+cur+"-s"}
+function xMark(i){document.querySelectorAll(".xline").forEach((el,j)=>el.classList.toggle("on",j===i))}
+function xSpeakAll(rate){return async()=>{const ls_=xlines();for(let i=0;i<ls_.length;i++){xMark(i);await speak(ls_[i][0],1,rate)}xMark(-1)}}
+function xPlay(rate,pr){playKey("x-"+xid(),xSpeakAll(rate),pr)}
+const B=(cls,id,zh,py,en)=>'<button class="big '+cls+'" id="'+id+'"><span>'+zh+' <i class="bpy">'+py+'</i></span><small>'+en+'</small></button>';
+function renderX(){
+  const T=X[tab],it=xitem(),n=xi[tab]+1;
+  try{history.replaceState(null,"","#"+tab+"-"+n)}catch(e){}
+  $("dayLabel").innerHTML=esc(T.name)+" "+n+"<small>"+T.en+" "+n+"</small>";
+  const pic=tab==="st"?it.pages[xpage].pic:it.pic;
+  let h='<div class="xpic" aria-hidden="true">'+pic+'</div>'+
+    '<div class="xkind">'+T.name+' <i class="bpy">'+T.py+'</i> · '+T.en+'</div>'+
+    '<h2 class="xtitle">'+esc(it.t)+'</h2><div class="xte">'+esc(it.te)+(it.sub?' · '+esc(it.sub):'')+'</div>';
+  if(tab==="st")h+='<div class="xpage">第 '+(xpage+1)+' 页 · Page '+(xpage+1)+' of '+it.pages.length+'</div>';
+  h+='<div class="xlines">'+xlines().map((l,i)=>'<button class="xline" data-i="'+i+'"><div class="zh">'+esc(l[0])+'</div><div class="spy">'+esc(l[1])+'</div><div class="en">'+esc(l[2])+'</div></button>').join("")+'</div>';
+  h+='<div class="xhint">Tap a line to hear it · 点一句听一句</div>';
+  if(tab==="tw")h+='<div class="play">'+B("","xSlow","🐢 慢慢读","mànmàn dú","Slow")+B("alt","xFast","🐇 快快读","kuàikuài dú","Fast")+'</div>';
+  else if(tab==="rh")h+='<div class="play">'+B("","xAll","🔊 读一读","dú yi dú","Hear it all")+'</div>';
+  else h+='<div class="play">'+B("sm","xPrev","◀ 上一页","shàng yí yè","Back")+B("sm alt","xRead","🔊 读","dú","Read page")+B("sm","xNext","下一页 ▶","xià yí yè","Next")+'</div>';
+  h+='<div class="play">'+B("make","xTry","🎤 试试","shìshi","Try it yourself")+'</div>';
+  $("xbody").innerHTML=h;
+  document.querySelectorAll(".xline").forEach(el=>el.onclick=()=>{const l=xlines()[+el.dataset.i];
+    if(hasZh===false){toast("This browser has no built-in Chinese voice. Use the big play button to hear Mom.");return}
+    xMark(+el.dataset.i);speak(l[0]).then(()=>xMark(-1))});
+  if($("xSlow")){$("xSlow").onclick=()=>xPlay(.55,.75);$("xFast").onclick=()=>xPlay(1.05,1.25)}
+  if($("xAll"))$("xAll").onclick=()=>xPlay(.75,1);
+  if($("xRead")){$("xRead").onclick=()=>xPlay(.75,1);
+    $("xPrev").disabled=xpage===0;$("xNext").disabled=xpage===it.pages.length-1;
+    $("xPrev").style.opacity=xpage===0?.45:1;$("xNext").style.opacity=xpage===it.pages.length-1?.45:1;
+    $("xPrev").onclick=()=>{if(xpage>0){xpage--;renderX();refreshParent()}};
+    $("xNext").onclick=()=>{if(xpage<it.pages.length-1){xpage++;renderX();refreshParent()}}}
+  $("xTry").onclick=zShow;
+  $("xshelfTitle").textContent="所有的"+T.name+" · All "+T.ens;
+  $("xshelfSub").textContent="小猫陪你学中文 · Learn Chinese with Kitty";
+  const t=$("xtiles");t.innerHTML="";
+  T.items.forEach((x,i)=>{const b=document.createElement("button");b.className="xtile"+(i===xi[tab]?" cur":"");
+    b.innerHTML='<b aria-hidden="true">'+x.pic+'</b><span>'+esc(x.t)+'<small>'+esc(x.te)+'</small></span>';
+    b.onclick=()=>{xi[tab]=i;xpage=0;renderX();refreshParent();const tb=tab;playMomOnly("x-"+xid(),()=>tab===tb&&xi[tb]===i);window.scrollTo({top:0,behavior:"smooth"})};
+    t.appendChild(b)});
+}
+function showTab(t){
+  if(!(t==="chars"||X[t]))t="chars";
+  tab=t;ls.set("tab",t);
+  $("card").hidden=t!=="chars";$("cshelf").hidden=t!=="chars";$("xcard").hidden=t==="chars";$("xshelf").hidden=t==="chars";
+  document.querySelectorAll(".tabbar button").forEach(b=>b.setAttribute("aria-selected",String(b.dataset.tab===t)));
+  (t==="chars"?$("card"):$("xcard")).prepend($("cat"));
+  try{speechSynthesis.cancel()}catch(e){}player.pause();
+  if(t==="chars")render();else renderX();
+  refreshParent();
+}
+function route(h){
+  h=(h||"").replace(/^#/,"");let m;
+  if((m=h.match(/^(tw|rh|st)-(\d+)$/))&&+m[2]>=1&&+m[2]<=X[m[1]].items.length){xi[m[1]]=+m[2]-1;xpage=0;showTab(m[1]);return true}
+  if(/^\d+$/.test(h)&&+h>=1&&+h<=L.length){cur=+h-1;showTab("chars");return true}
+  return false;
+}
+document.querySelectorAll(".tabbar button").forEach(b=>b.onclick=()=>{showTab(b.dataset.tab);window.scrollTo(0,0)});
 /* ===== 造句 make-a-sentence pop-up ===== */
 const SR=window.SpeechRecognition||window.webkitSpeechRecognition;
 let zRec=null,zSR=null,zChunks=[],zOn=false,zText="",zFinal="",zBlob=null,zURL=null,zStream=null;
 const zaoPlayer=new Audio();
 function toPinyin(t){try{return window.pinyinPro?pinyinPro.pinyin(t,{toneType:"symbol",nonZh:"consecutive"}):""}catch(e){return ""}}
+let zT=null;
+function zTarget(){
+  if(tab==="chars"){const [h,py,mean]=L[cur];
+    return {mode:"char",big:h,py,mean,word:h,save:"z-"+cur,title:'🎤 造句<i>zàojù</i>',
+      tip:'Tap the microphone and say a fun sentence in Chinese using <em>'+esc(h)+'</em>. Tap again when you\'re done.',
+      mine:'<span>▶︎ 我的造句 <i class="bpy">wǒ de zàojù</i></span><small>Hear my sentence</small>'}}
+  const it=xitem();
+  return {mode:"match",big:it.t,py:"",mean:it.te,save:"z-"+xid(),title:'🎤 试试<i>shìshi</i>',text:xlines().map(l=>l[0]).join(""),
+    tip:tab==="tw"?"Tap the microphone and say the tongue twister. Tap again when you're done.":tab==="rh"?"Tap the microphone and say the rhyme. Tap again when you're done.":"Tap the microphone and read this page aloud. Tap again when you're done.",
+    mine:'<span>▶︎ 我的录音 <i class="bpy">wǒ de lùyīn</i></span><small>Hear my voice</small>'}
+}
 function zShow(){
-  const [h,py,mean]=L[cur];
-  $("zaoHan").textContent=h;$("zaoHan2").textContent=h;$("zaoPy").firstChild.nodeValue=py;$("zaoMean").textContent=mean;
+  zT=zTarget();
+  $("zaoTitle").innerHTML=zT.title;$("zaoHan").textContent=zT.big;$("zaoHan").classList.toggle("long",[...zT.big].length>2);
+  $("zaoPy").firstChild.nodeValue=zT.py;$("zaoMean").textContent=zT.mean;$("zaoTip").innerHTML=zT.tip;$("zaoMine").innerHTML=zT.mine;
   zText="";zBlob=null;$("zaoResult").hidden=true;$("zaoPlayRow").hidden=true;$("zaoStatus").textContent="Tap to start";
-  get("z-"+cur).then(saved=>{if(saved&&saved.blob){zBlob=saved.blob;zText=saved.text||"";zRender(true)}});
+  const key=zT.save;get(key).then(saved=>{if(saved&&saved.blob&&zT&&zT.save===key){zBlob=saved.blob;zText=saved.text||"";zRender(true)}});
   $("zao").hidden=false;$("zaoMic").focus();
+}
+function matchScore(heard,target){
+  const han=t=>[...(t||"")].filter(c=>/\p{Script=Han}/u.test(c));
+  const want=han(target),got=han(heard);if(!want.length)return 0;
+  const bag={};got.forEach(c=>bag[c]=(bag[c]||0)+1);let hit=0;
+  want.forEach(c=>{if(bag[c]){hit++;bag[c]--}});return hit/want.length;
 }
 function zClose(){if(zOn)zStop();zaoPlayer.pause();$("zao").hidden=true}
 function zRender(fromSave){
-  const h=L[cur][0];
+  const h=zT.word||"";
   $("zaoResult").hidden=false;
-  if(zText){
+  if(zText&&zT.mode==="match"){
+    $("zaoText").textContent=zText;$("zaoTextPy").textContent=toPinyin(zText);
+    const sc=matchScore(zText,zT.text);
+    $("zaoPraise").hidden=sc<.8;$("zaoPraise").textContent="⭐ 太棒了！ Great job, you said it!";
+    $("zaoHint").hidden=sc>=.8;$("zaoHint").textContent=sc>=.5?"Good try, almost there! Listen once more and try again.":"Keep going! Listen to it again, then try once more.";
+  }else if(zText){
     $("zaoText").innerHTML=esc(zText).split(h).join("<b>"+h+"</b>");
     $("zaoTextPy").textContent=toPinyin(zText);
     const used=zText.includes(h);
@@ -789,7 +929,7 @@ function zDone(){
   zPending=Math.max(0,zPending-1);if(zPending>0)return;
   music.volume=.3;zText=(zText||"").trim();
   zRender(false);$("zaoStatus").textContent=zText?"Here's your sentence!":"Tap to try again";
-  if(zBlob)put("z-"+cur,{blob:zBlob,text:zText});
+  if(zBlob&&zT)put(zT.save,{blob:zBlob,text:zText});
 }
 $("makeBtn").onclick=zShow;
 $("zaoClose").onclick=zClose;
@@ -799,6 +939,7 @@ $("zaoMic").onclick=()=>{zOn?zStop():zStart()};
 $("zaoMine").onclick=()=>{if(!zBlob)return;if(zURL)URL.revokeObjectURL(zURL);zURL=URL.createObjectURL(zBlob);zaoPlayer.src=zURL;zaoPlayer.play().catch(()=>{})};
 $("zaoRead").onclick=()=>{if(zText)speak(zText)};
 applyTheme();render();
+if(!route(HASH0)){const lt=ls.get("tab","chars");if(lt!=="chars")showTab(lt)}
 </script>
 </body>
 </html>
