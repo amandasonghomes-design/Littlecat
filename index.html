@@ -792,15 +792,20 @@ function renderX(){
     '<h2 class="xtitle">'+esc(it.t)+'</h2><div class="xte">'+esc(it.te)+(it.sub?' · '+esc(it.sub):'')+'</div>';
   if(tab==="st")h+='<div class="xpage">第 '+(xpage+1)+' 页 · Page '+(xpage+1)+' of '+it.pages.length+'</div>';
   h+='<div class="xlines">'+xlines().map((l,i)=>'<button class="xline" data-i="'+i+'"><div class="zh">'+esc(l[0])+'</div><div class="spy">'+esc(l[1])+'</div><div class="en">'+esc(l[2])+'</div></button>').join("")+'</div>';
-  h+='<div class="xhint">Tap a line to hear it · 点一句听一句</div>';
+  h+='<div class="xhint">Tap the words to hear them · 点一点，听一听</div>';
   if(tab==="tw")h+='<div class="play">'+B("","xSlow","🐢 慢慢读","mànmàn dú","Slow")+B("alt","xFast","🐇 快快读","kuàikuài dú","Fast")+'</div>';
   else if(tab==="rh")h+='<div class="play">'+B("","xAll","🔊 读一读","dú yi dú","Hear it all")+'</div>';
   else h+='<div class="play">'+B("sm","xPrev","◀ 上一页","shàng yí yè","Back")+B("sm alt","xRead","🔊 读","dú","Read page")+B("sm","xNext","下一页 ▶","xià yí yè","Next")+'</div>';
   h+='<div class="play">'+B("make","xTry","🎤 试试","shìshi","Try it yourself")+'</div>';
   $("xbody").innerHTML=h;
-  document.querySelectorAll(".xline").forEach(el=>el.onclick=()=>{const l=xlines()[+el.dataset.i];
-    if(hasZh===false){toast("This browser has no built-in Chinese voice. Use the big play button to hear Mom.");return}
-    xMark(+el.dataset.i);speak(l[0]).then(()=>xMark(-1))});
+  document.querySelectorAll(".xline").forEach(el=>el.onclick=async()=>{const i=+el.dataset.i,l=xlines()[i];
+    // Mom's voice picked and Mom recorded this piece: play her recording
+    if(voice==="mom"){const src=await srcFor("x-"+xid());
+      if(src){try{speechSynthesis.cancel()}catch(e){}player.src=src;player.defaultPlaybackRate=player.playbackRate=1;duck(true);
+        document.querySelectorAll(".xline").forEach(x=>x.classList.add("on"));
+        player.onended=()=>{duck(false);xMark(-1)};try{await player.play()}catch(e){duck(false);xMark(-1)}return}}
+    if(hasZh===false){toast("Mom hasn't recorded this one yet, and this browser has no built-in Chinese voice.");return}
+    xMark(i);speak(l[0]).then(()=>xMark(-1))});
   if($("xSlow")){$("xSlow").onclick=()=>xPlay(.55,.75);$("xFast").onclick=()=>xPlay(1.05,1.25)}
   if($("xAll"))$("xAll").onclick=()=>xPlay(.75,1);
   if($("xRead")){$("xRead").onclick=()=>xPlay(.75,1);
