@@ -134,6 +134,36 @@ button:focus-visible{outline:3px solid var(--accent2);outline-offset:2px}
 .toast{position:fixed;left:50%;bottom:calc(20px + env(safe-area-inset-bottom,0px));transform:translate(-50%,30px);opacity:0;pointer-events:none;z-index:8;
   width:min(360px,calc(100% - 32px));background:#2a1f33;color:#fff;border-radius:16px;padding:12px 16px;font-family:var(--display);font-size:15px;line-height:1.35;text-align:center;box-shadow:0 10px 30px rgba(0,0,0,.3);transition:.3s}
 .toast.show{opacity:1;transform:translate(-50%,0)}
+.bpy{white-space:nowrap;font-style:normal;font-family:var(--pinyin);font-weight:600;font-size:.7em;opacity:.9;margin-left:2px}
+.big.gold{background:#ffc93c;color:#5a3a00}
+.big.make{background:var(--accent2)}
+/* 造句 pop-up */
+.zao{position:fixed;inset:0;z-index:9;display:grid;place-items:center;background:rgba(20,10,30,.45);
+  padding:max(16px,env(safe-area-inset-top,0px)) max(16px,env(safe-area-inset-right,0px)) max(16px,env(safe-area-inset-bottom,0px)) max(16px,env(safe-area-inset-left,0px))}
+.zao .sheet{position:relative;width:100%;max-width:420px;max-height:100%;overflow:auto;background:var(--card);border-radius:28px;padding:20px 18px 22px;
+  box-shadow:0 12px 0 rgba(0,0,0,.12),0 20px 40px rgba(0,0,0,.25);display:flex;flex-direction:column;align-items:center;gap:12px;text-align:center;animation:popin .35s cubic-bezier(.3,1.5,.5,1)}
+.zao .x{position:absolute;top:10px;right:10px;width:40px;height:40px;border-radius:50%;border:0;background:#efe8f0;font-size:20px;cursor:pointer;color:var(--ink)}
+.zao h3{margin:0;font-family:var(--display);font-size:24px;color:var(--ink)}
+.zao h3 i{font-style:normal;font-family:var(--pinyin);font-size:15px;color:var(--soft);margin-left:4px}
+.zao .target{display:flex;align-items:center;gap:12px;background:#fff;border:2px solid var(--grid);border-radius:18px;padding:8px 16px}
+.zao .target b{font-family:var(--han);font-size:52px;line-height:1;color:var(--ink)}
+.zao .target span{font-family:var(--pinyin);font-size:18px;color:var(--accent);text-align:left}
+.zao .target small{display:block;font-family:var(--display);font-size:14px;color:var(--soft)}
+.zao .tip{margin:0;font-family:var(--display);font-size:16px;color:var(--soft);line-height:1.35;max-width:30ch}
+.zao .tip em{font-style:normal;color:var(--ink);font-family:var(--body)}
+.mic{width:96px;height:96px;border-radius:50%;border:0;background:var(--accent);color:#fff;font-size:42px;cursor:pointer;box-shadow:0 6px 0 rgba(0,0,0,.18);display:grid;place-items:center}
+.mic.on{background:#e23b3b;animation:pulse 1.2s infinite}
+@keyframes pulse{0%{box-shadow:0 0 0 0 rgba(226,59,59,.55),0 6px 0 rgba(0,0,0,.18)}100%{box-shadow:0 0 0 22px rgba(226,59,59,0),0 6px 0 rgba(0,0,0,.18)}}
+.zao .status{font-family:var(--display);font-weight:700;font-size:15px;color:var(--ink);min-height:20px}
+.zao .result{width:100%;background:color-mix(in srgb,var(--accent2) 16%,#fff);border-radius:18px;padding:12px 14px}
+.zao .result .zh{font-size:26px;font-weight:700;letter-spacing:.04em;color:var(--ink);word-break:break-all}
+.zao .result .zh b{color:var(--accent)}
+.zao .result .rpy{font-family:var(--pinyin);font-size:16px;color:var(--soft);margin-top:2px}
+.zao .result .praise{font-family:var(--display);font-weight:800;color:#2a9d5b;margin-top:6px}
+.zao .result .hint{font-family:var(--display);font-size:14px;color:var(--soft);margin-top:6px}
+.zao .row2{display:flex;gap:10px;width:100%}
+.zao .row2 .big{font-size:16px;padding:10px}
+@media (prefers-reduced-motion:reduce){.mic.on{animation:none}.zao .sheet{animation:none}}
 .parentbtn{align-self:center;border:0;background:rgba(255,255,255,.6);border-radius:999px;padding:8px 16px;font-family:var(--display);font-size:14px;cursor:pointer;color:var(--ink)}
 .drawer{position:fixed;inset:auto 0 0 0;z-index:5;background:#fffdf9;border-radius:24px 24px 0 0;max-height:86%;overflow:auto;box-shadow:0 -10px 40px rgba(0,0,0,.3);
   padding:16px max(16px,env(safe-area-inset-right,0px)) calc(20px + env(safe-area-inset-bottom,0px)) max(16px,env(safe-area-inset-left,0px))}
@@ -155,6 +185,7 @@ select{font:inherit;padding:6px 8px;border-radius:10px;border:1px solid #d9cfdc;
 .baby.go{animation:wig .6s;opacity:1}
 @keyframes wig{25%{transform:rotate(-15deg) scale(1.3)}75%{transform:rotate(15deg) scale(1.3)}}
 </style>
+<script src="https://cdn.jsdelivr.net/npm/pinyin-pro@3.26.0/dist/index.js" defer></script>
 </head>
 <body>
 
@@ -180,15 +211,18 @@ select{font:inherit;padding:6px 8px;border-radius:10px;border:1px solid #d9cfdc;
       <div id="sentBody"></div>
     </button>
     <div class="play">
-      <button class="big" id="playChar"><span>🔊 字</span><small>Hear the character</small></button>
-      <button class="big alt" id="playSent"><span>🔊 句子</span><small>Hear the sentence</small></button>
+      <button class="big" id="playChar"><span>🔊 字 <i class="bpy">zì</i></span><small>Hear the character</small></button>
+      <button class="big alt" id="playSent"><span>🔊 句子 <i class="bpy">jùzi</i></span><small>Hear the sentence</small></button>
     </div>
-    <button class="big" id="learned" style="width:100%;background:#ffc93c;color:#5a3a00"><span>⭐ 我学会了！</span><small>I learned it!</small></button>
+    <div class="play">
+      <button class="big gold" id="learned"><span>⭐ 学会了 <i class="bpy">xuéhuì le</i></span><small>I learned it!</small></button>
+      <button class="big make" id="makeBtn"><span>🎤 造句 <i class="bpy">zàojù</i></span><small>Make a sentence</small></button>
+    </div>
   </main>
 
   <div class="voice" role="group" aria-label="Voice">
-    <button id="vMom" aria-pressed="true"><span>👩 妈妈</span><small>Mom's voice</small></button>
-    <button id="vBot" aria-pressed="false"><span>🤖 机器</span><small>Robot voice</small></button>
+    <button id="vMom" aria-pressed="true"><span>👩 妈妈 <i class="bpy">māma</i></span><small>Mom's voice</small></button>
+    <button id="vBot" aria-pressed="false"><span>🤖 机器 <i class="bpy">jīqì</i></span><small>Robot voice</small></button>
   </div>
   <div class="note" id="note"></div>
 
@@ -201,7 +235,27 @@ select{font:inherit;padding:6px 8px;border-radius:10px;border:1px solid #d9cfdc;
   <button class="parentbtn" id="openParent">For Mom ⚙︎</button>
 </div>
 
-<div class="celebrate" id="celebrate" hidden><div class="box"><img src="img/cat-blossom.jpg" alt=""><b>你真棒！</b><small>Great job!</small></div></div>
+<div class="zao" id="zao" hidden role="dialog" aria-modal="true" aria-labelledby="zaoTitle">
+  <div class="sheet">
+    <button class="x" id="zaoClose" aria-label="Close">✕</button>
+    <h3 id="zaoTitle">🎤 造句<i>zàojù</i></h3>
+    <div class="target"><b id="zaoHan">水</b><span id="zaoPy">shuǐ<small id="zaoMean">water</small></span></div>
+    <p class="tip">Tap the microphone and say a fun sentence in Chinese using <em id="zaoHan2">水</em>. Tap again when you're done.</p>
+    <button class="mic" id="zaoMic" aria-label="Start recording">🎤</button>
+    <div class="status" id="zaoStatus">Tap to start</div>
+    <div class="result" id="zaoResult" hidden>
+      <div class="zh" id="zaoText"></div>
+      <div class="rpy" id="zaoTextPy"></div>
+      <div class="praise" id="zaoPraise" hidden></div>
+      <div class="hint" id="zaoHint" hidden></div>
+    </div>
+    <div class="row2" id="zaoPlayRow" hidden>
+      <button class="big" id="zaoMine"><span>▶︎ 我的 <i class="bpy">wǒ de</i></span><small>Hear my voice</small></button>
+      <button class="big alt" id="zaoRead"><span>🔊 读 <i class="bpy">dú</i></span><small>Hear it read aloud</small></button>
+    </div>
+  </div>
+</div>
+<div class="celebrate" id="celebrate" hidden><div class="box"><img src="img/cat-blossom.jpg" alt=""><b>你真棒！</b><small>nǐ zhēn bàng · Great job!</small></div></div>
 <div class="drawer" id="drawer" hidden>
   <div class="in">
     <div class="row" style="justify-content:space-between"><h3>Mom's corner</h3><button class="sb ghost" id="closeParent">Done</button></div>
@@ -415,17 +469,17 @@ function render(){
   const mark=t=>esc(t).split(h).join("<b>"+h+"</b>");
   if(dlg){
     $("sentBody").innerHTML=dlg.map(([w,z,p,e])=>'<div class="line '+(w==="A"?"a":"m")+'"><span class="who">'+(w==="A"?"Angelina":"妈妈 Mamaちゃん")+'</span><div class="zh">'+mark(z)+'</div><div class="spy">'+esc(p)+'</div><div class="en">'+esc(e)+'</div></div>').join("");
-    $("playSent").innerHTML="<span>🔊 对话</span><small>Hear the conversation</small>";
+    $("playSent").innerHTML='<span>🔊 对话 <i class="bpy">duìhuà</i></span><small>Hear the conversation</small>';
   }else{
     $("sentBody").innerHTML='<div class="zh">'+mark(zh)+'</div><div class="spy">'+esc(spy)+'</div><div class="en">'+esc(en)+'</div>';
-    $("playSent").innerHTML="<span>🔊 句子</span><small>Hear the sentence</small>";
+    $("playSent").innerHTML='<span>🔊 句子 <i class="bpy">jùzi</i></span><small>Hear the sentence</small>';
   }
   const u=unlocked(),t=$("tiles");t.innerHTML="";
   L.forEach((l,i)=>{const lv=LEVELS.find(x=>x[0]===i);if(lv){const hd=document.createElement("div");hd.className="lvl";hd.innerHTML=esc(lv[1])+" <small>· "+esc(lv[2])+"</small>";t.appendChild(hd)}
     const b=document.createElement("button");b.className="tile"+(i===cur?" cur":"")+(done.includes(i)?" done":"");
     b.disabled=i>=u;b.textContent=i<u?l[0]:"?";b.setAttribute("aria-label",i<u?"Lesson "+(i+1)+" "+l[0]:"Locked");
     b.onclick=()=>{cur=i;render();refreshParent();playMomOnly("v-"+i+"-c",i)};t.appendChild(b)});
-  $("learned").innerHTML=done.includes(cur)?"<span>⭐ 学会啦！</span><small>Learned! Tap again for stars</small>":"<span>⭐ 我学会了！</span><small>I learned it!</small>";
+  $("learned").innerHTML=done.includes(cur)?'<span>⭐ 学会啦 <i class="bpy">xuéhuì la</i></span><small>Learned!</small>':'<span>⭐ 学会了 <i class="bpy">xuéhuì le</i></span><small>I learned it!</small>';
   $("vMom").setAttribute("aria-pressed",voice==="mom");$("vBot").setAttribute("aria-pressed",voice==="bot");
   $("note").textContent="";
 }
@@ -663,6 +717,87 @@ $("secretBaby").onclick=e=>{
     h.style.left=(r.left+r.width/2-12)+"px";h.style.top=(r.top)+"px";h.style.setProperty("--dx",(Math.random()*160-80)+"px");
     h.style.animationDelay=(i*0.08)+"s";document.body.appendChild(h);setTimeout(()=>h.remove(),2000)}
 };
+/* ===== 造句 make-a-sentence pop-up ===== */
+const SR=window.SpeechRecognition||window.webkitSpeechRecognition;
+let zRec=null,zSR=null,zChunks=[],zOn=false,zText="",zFinal="",zBlob=null,zURL=null,zStream=null;
+const zaoPlayer=new Audio();
+function toPinyin(t){try{return window.pinyinPro?pinyinPro.pinyin(t,{toneType:"symbol",nonZh:"consecutive"}):""}catch(e){return ""}}
+function zShow(){
+  const [h,py,mean]=L[cur];
+  $("zaoHan").textContent=h;$("zaoHan2").textContent=h;$("zaoPy").firstChild.nodeValue=py;$("zaoMean").textContent=mean;
+  zText="";zBlob=null;$("zaoResult").hidden=true;$("zaoPlayRow").hidden=true;$("zaoStatus").textContent="Tap to start";
+  get("z-"+cur).then(saved=>{if(saved&&saved.blob){zBlob=saved.blob;zText=saved.text||"";zRender(true)}});
+  $("zao").hidden=false;$("zaoMic").focus();
+}
+function zClose(){if(zOn)zStop();zaoPlayer.pause();$("zao").hidden=true}
+function zRender(fromSave){
+  const h=L[cur][0];
+  $("zaoResult").hidden=false;
+  if(zText){
+    $("zaoText").innerHTML=esc(zText).split(h).join("<b>"+h+"</b>");
+    $("zaoTextPy").textContent=toPinyin(zText);
+    const used=zText.includes(h);
+    $("zaoPraise").hidden=!used;$("zaoPraise").textContent="⭐ 你用了 "+h+"！ You used "+h+"!";
+    $("zaoHint").hidden=used;$("zaoHint").textContent="Nice! Can you try one with "+h+" in it?";
+  }else{
+    $("zaoText").textContent="";$("zaoTextPy").textContent="";$("zaoPraise").hidden=true;
+    $("zaoHint").hidden=false;
+    $("zaoHint").textContent=SR?"I couldn't hear the Chinese words. Try again a little louder.":"This browser can't turn speech into Chinese text. You can still listen to your recording. Chrome or Safari can show the words.";
+  }
+  $("zaoPlayRow").hidden=!zBlob;$("zaoRead").hidden=!(zText&&hasZh);
+  if(fromSave)$("zaoStatus").textContent="Your last sentence. Tap to try a new one.";
+}
+async function zStart(){
+  try{speechSynthesis.cancel()}catch(e){}player.pause();zaoPlayer.pause();music.volume=.08;
+  zText="";zFinal="";zChunks=[];zBlob=null;$("zaoResult").hidden=true;$("zaoText").textContent="";$("zaoTextPy").textContent="";
+  $("zaoPraise").hidden=true;$("zaoHint").hidden=true;$("zaoPlayRow").hidden=true;
+  // record the voice
+  if(navigator.mediaDevices&&window.MediaRecorder){
+    try{
+      zStream=await navigator.mediaDevices.getUserMedia({audio:true});
+      const type=["audio/mp4","audio/webm;codecs=opus","audio/webm"].find(t=>MediaRecorder.isTypeSupported&&MediaRecorder.isTypeSupported(t));
+      const rec=new MediaRecorder(zStream,type?{mimeType:type}:undefined),stream=zStream;zRec=rec;
+      rec.ondataavailable=e=>{if(e.data.size)zChunks.push(e.data)};
+      rec.onstop=()=>{stream.getTracks().forEach(t=>t.stop());if(zChunks.length){zBlob=new Blob(zChunks,{type:rec.mimeType||type||"audio/mp4"})}zDone()};
+      rec.start();
+    }catch(e){$("zaoStatus").textContent="Please allow the microphone, then tap again.";music.volume=.3;return}
+  }
+  // turn speech into Chinese text
+  if(SR){
+    try{
+      zSR=new SR();zSR.lang="zh-CN";zSR.interimResults=true;zSR.continuous=true;
+      zSR.onresult=e=>{let fin="",tmp="";for(let i=0;i<e.results.length;i++){const r=e.results[i];if(r.isFinal)fin+=r[0].transcript;else tmp+=r[0].transcript}
+        zFinal=fin;zText=(fin+tmp).trim();$("zaoText").textContent=zText;if(zText)$("zaoResult").hidden=false;};
+      zSR.onerror=()=>{};zSR.onend=()=>{if(zOn&&!zRec)zStop()};
+      zSR.start();
+    }catch(e){zSR=null}
+  }
+  if(!zRec&&!zSR){$("zaoStatus").textContent="This browser can't use the microphone.";return}
+  zOn=true;$("zaoMic").classList.add("on");$("zaoMic").textContent="■";$("zaoMic").setAttribute("aria-label","Stop recording");
+  $("zaoStatus").textContent="Listening… tap when you're done";
+}
+let zPending=0;
+function zStop(){
+  zOn=false;$("zaoMic").classList.remove("on");$("zaoMic").textContent="🎤";$("zaoMic").setAttribute("aria-label","Start recording");
+  $("zaoStatus").textContent="Got it!";
+  zPending=(zRec?1:0)+(zSR?1:0);
+  if(zSR){const s=zSR;zSR=null;s.onend=()=>{zDone()};try{s.stop()}catch(e){zDone()}setTimeout(()=>{if(zPending>0&&!zRec)zDone()},1500)}
+  if(zRec){const r=zRec;zRec=null;try{r.stop()}catch(e){zDone()}}
+  if(zPending===0)zDone();
+}
+function zDone(){
+  zPending=Math.max(0,zPending-1);if(zPending>0)return;
+  music.volume=.3;zText=(zText||"").trim();
+  zRender(false);$("zaoStatus").textContent=zText?"Here's your sentence!":"Tap to try again";
+  if(zBlob)put("z-"+cur,{blob:zBlob,text:zText});
+}
+$("makeBtn").onclick=zShow;
+$("zaoClose").onclick=zClose;
+$("zao").addEventListener("click",e=>{if(e.target.id==="zao")zClose()});
+document.addEventListener("keydown",e=>{if(e.key==="Escape"&&!$("zao").hidden)zClose()});
+$("zaoMic").onclick=()=>{zOn?zStop():zStart()};
+$("zaoMine").onclick=()=>{if(!zBlob)return;if(zURL)URL.revokeObjectURL(zURL);zURL=URL.createObjectURL(zBlob);zaoPlayer.src=zURL;zaoPlayer.play().catch(()=>{})};
+$("zaoRead").onclick=()=>{if(zText)speak(zText)};
 applyTheme();render();
 </script>
 </body>
