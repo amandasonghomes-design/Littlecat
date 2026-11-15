@@ -424,7 +424,7 @@ function render(){
   L.forEach((l,i)=>{const lv=LEVELS.find(x=>x[0]===i);if(lv){const hd=document.createElement("div");hd.className="lvl";hd.innerHTML=esc(lv[1])+" <small>· "+esc(lv[2])+"</small>";t.appendChild(hd)}
     const b=document.createElement("button");b.className="tile"+(i===cur?" cur":"")+(done.includes(i)?" done":"");
     b.disabled=i>=u;b.textContent=i<u?l[0]:"?";b.setAttribute("aria-label",i<u?"Lesson "+(i+1)+" "+l[0]:"Locked");
-    b.onclick=()=>{cur=i;render();refreshParent()};t.appendChild(b)});
+    b.onclick=()=>{cur=i;render();refreshParent();playMomOnly("v-"+i+"-c",i)};t.appendChild(b)});
   $("learned").innerHTML=done.includes(cur)?"<span>⭐ 学会啦！</span><small>Learned! Tap again for stars</small>":"<span>⭐ 我学会了！</span><small>I learned it!</small>";
   $("vMom").setAttribute("aria-pressed",voice==="mom");$("vBot").setAttribute("aria-pressed",voice==="bot");
   $("note").textContent="";
@@ -503,6 +503,17 @@ async function playKey(key,text){
     if(hasZh!==false)$("note").textContent="Mom hasn't recorded this one yet, so the robot is reading it.";
   }
   return typeof text==="function"?text():speak(text);
+}
+/* tapping a tile plays Mom's recording of the character, only if she recorded it; never the robot */
+let tileTap=0;
+async function playMomOnly(key,i){
+  const my=++tileTap;
+  try{speechSynthesis.cancel()}catch(e){}
+  player.pause();
+  const src=await srcFor(key);
+  if(!src||my!==tileTap||cur!==i)return;
+  player.src=src;duck(true);player.onended=()=>duck(false);
+  try{await player.play()}catch(e){duck(false)}
 }
 const sayChar=()=>{$("tzg").classList.remove("pop");void $("tzg").offsetWidth;$("tzg").classList.add("pop");playKey("v-"+cur+"-c",L[cur][0])};
 const sentText=i=>L[i][7]?async()=>{for(const [w,z] of L[i][7]){await speak(z,w==="A"?1.5:1)}}:L[i][4];
