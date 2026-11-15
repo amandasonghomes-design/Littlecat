@@ -597,12 +597,12 @@ async function srcFor(key){
   }
   return rem;
 }
-/* very fast playback also raises the pitch, for a silly chipmunk voice */
+/* keep Mom's natural pitch at any speed */
 function setPitchKeep(on){try{player.preservesPitch=on;player.webkitPreservesPitch=on;player.mozPreservesPitch=on}catch(e){}}
 async function playKey(key,text,pr){
   if(voice==="mom"){
     const src=await srcFor(key);
-    if(src){try{speechSynthesis.cancel()}catch(e){}player.src=src;player.defaultPlaybackRate=player.playbackRate=pr||1;setPitchKeep(!(pr>1.5));duck(true);
+    if(src){try{speechSynthesis.cancel()}catch(e){}player.src=src;player.defaultPlaybackRate=player.playbackRate=pr||1;setPitchKeep(true);duck(true);
       player.onended=()=>duck(false);try{await player.play();return}catch(e){duck(false)}}
     if(hasZh!==false)$("note").textContent="Mom hasn't recorded this one yet, so the robot is reading it.";
   }
