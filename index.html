@@ -179,6 +179,8 @@ button:focus-visible{outline:3px solid var(--accent2);outline-offset:2px}
 .xpic{font-size:60px;line-height:1.1;margin-top:4px;letter-spacing:4px}
 .xkind{font-family:var(--display);font-weight:700;font-size:14px;color:var(--soft)}
 .xtitle{margin:-6px 0 0;font-family:var(--han);font-size:34px;line-height:1.2;color:var(--ink);text-wrap:balance}
+.xall{vertical-align:middle;width:44px;height:44px;border-radius:50%;border:0;background:var(--accent);color:#fff;font-size:20px;cursor:pointer;box-shadow:0 4px 0 rgba(0,0,0,.15);margin-left:6px;position:relative;top:-4px}
+.xall:active{transform:translateY(2px);box-shadow:0 2px 0 rgba(0,0,0,.15)}
 .xte{font-family:var(--display);font-size:15px;color:var(--soft);margin-top:-10px;text-wrap:balance}
 .xpage{font-family:var(--display);font-size:13px;font-weight:700;color:var(--accent)}
 .xlines{width:100%;display:flex;flex-direction:column;gap:8px}
@@ -791,7 +793,7 @@ function renderX(){
   const pic=tab==="st"?it.pages[xpage].pic:it.pic;
   let h='<div class="xpic" aria-hidden="true">'+pic+'</div>'+
     '<div class="xkind">'+T.name+' <i class="bpy">'+T.py+'</i> · '+T.en+'</div>'+
-    '<h2 class="xtitle">'+esc(it.t)+'</h2><div class="xte">'+esc(it.te)+(it.sub?' · '+esc(it.sub):'')+'</div>';
+    '<h2 class="xtitle">'+esc(it.t)+(tab==="tw"?' <button class="xall" id="xTitlePlay" aria-label="Play the whole tongue twister">🔊</button>':'')+'</h2><div class="xte">'+esc(it.te)+(it.sub?' · '+esc(it.sub):'')+'</div>';
   if(tab==="st")h+='<div class="xpage">第 '+(xpage+1)+' 页 · Page '+(xpage+1)+' of '+it.pages.length+'</div>';
   h+='<div class="xlines">'+xlines().map((l,i)=>'<button class="xline" data-i="'+i+'"><div class="zh">'+esc(l[0])+'</div><div class="spy">'+esc(l[1])+'</div><div class="en">'+esc(l[2])+'</div></button>').join("")+'</div>';
   h+='<div class="xhint">Tap the words to hear them · 点一点，听一听</div>';
@@ -808,6 +810,7 @@ function renderX(){
         player.onended=()=>{duck(false);xMark(-1)};try{await player.play()}catch(e){duck(false);xMark(-1)}return}}
     if(hasZh===false){toast("Mom hasn't recorded this one yet, and this browser has no built-in Chinese voice.");return}
     xMark(i);speak(l[0]).then(()=>xMark(-1))});
+  if($("xTitlePlay"))$("xTitlePlay").onclick=()=>xPlay(.75,1);
   if($("xSlow")){$("xSlow").onclick=()=>xPlay(.55,.75);$("xFast").onclick=()=>xPlay(2,2.2,1.8)}
   if($("xAll"))$("xAll").onclick=()=>xPlay(.75,1);
   if($("xRead")){$("xRead").onclick=()=>xPlay(.75,1);
